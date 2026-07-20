@@ -6,14 +6,15 @@
                 { "path": "src/Introduction/Intro.md", "title": "Course Introduction" },
                 { "path": "src/Introduction/Lean.md", "title": "Lean" },
                 { "path": "src/Introduction/Programming.md", "title": "Programming" },
-                { "path": "src/Introduction/Datatypes.md", "title": "Datatypes" }
+                { "path": "src/Introduction/Datatypes.md", "title": "Datatypes" },
+                { "path": "src/Introduction/VibeProving.md", "title": "Vibe Proving" }
             ]
         }, 
         { 
             "name": "Type Theory", 
             "decks": [
-                { "path": "src/TypeTheory/Overview.md", "title": "Foundations" },
-                { "path": "src/TypeTheory/Universes.md", "title": "Universes" },
+                { "path": "src/TypeTheory/Overview.md", "title": "(Foundations)" },
+                { "path": "src/TypeTheory/Universes.md", "title": "(Universes)" },
                 { "path": "src/TypeTheory/Simple.md", "title": "Simple Types" },
                 { "path": "src/TypeTheory/NonSimpleTypes.md", "title": "Non Simple Types" },
                 { "path": "src/TypeTheory/Inference.md", "title": "Inference" }            
@@ -27,7 +28,8 @@
                 { "path": "src/Logic/Connectives.md", "title": "Connectives" }, 
                 { "path": "src/Logic/FirstOrder.md", "title": "First Order Logic" },
                 { "path": "src/Logic/Tactics.md", "title": "Tactics" },                           
-                { "path": "src/Logic/Equality.md", "title": "Equality" }
+                { "path": "src/Logic/Equality.md", "title": "Equality" },
+                { "path": "src/Maths/Autoformalization.md", "title": "Autoformalization"}
             ]
         },
         { 
@@ -42,6 +44,8 @@
         {
             "name": "Examples",
             "decks": [
+                { "path": "src/Examples/Polytopes.md", "title": "Polytopes" },
+                { "path": "src/Examples/CategoryTheory.md", "title": "Category Theory" },
                 { "path": "src/Examples/FOL.md", "title": "First Order Logic" },
                 { "path": "src/Examples/TemporalLogic.md", "title": "Temporal Logic" }
             ]

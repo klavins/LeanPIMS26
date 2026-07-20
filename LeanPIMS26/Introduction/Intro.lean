@@ -12,6 +12,8 @@ namespace LeanW26
 /-
 Automated Mathematics
 ===
+Luz Elena Grisales Gómez and Nat Hurtig (TAs)
+A Pacific Institute for the Mathematical Sciences <a href="https://www.pims.math.ca/events/260817-pwoamla">Workshop</a>, held August 17-19 at the University of British Columbia.
 
 What is this Course About?
 ===

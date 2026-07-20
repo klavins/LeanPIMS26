@@ -1,6 +1,8 @@
 
 Automated Mathematics
 ===
+Luz Elena Grisales Gómez and Nat Hurtig (TAs)
+A Pacific Institute for the Mathematical Sciences <a href="https://www.pims.math.ca/events/260817-pwoamla">Workshop</a>, held August 17-19 at the University of British Columbia.
 
 What is this Course About?
 ===
@@ -44,7 +46,8 @@ Proof Assistants and Math
 - He posed a challenge: Encode it in Lean.
 - A group of volunteers led by Johan Commelin produced a Lean version of the main theorem in six months.
 
-> I find it absolutely insane that interactive proof assistants are now at the level that, within a very reasonable time span, they can formally verify difficult original research.
+> I find it absolutely insane that interactive proof assistants are now at the level that, within a
+> very reasonable time span, they can formally verify difficult original research.
 >
 > — Peter Scholze
 

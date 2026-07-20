@@ -17,6 +17,8 @@ class Thumbnail extends React.PureComponent {
       classes += " active-title";
     }
 
+    this.props.title = this.props.title.split(" --")[0];
+
     let t = this.props.title.length > 22 
           ? this.props.title.slice(0,19) + "..."
           : this.props.title;

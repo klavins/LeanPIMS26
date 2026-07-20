@@ -49,15 +49,24 @@ class Slide extends React.PureComponent {
     if (this.props.id == 0) {
 
         let title = this.props.content.split('\n')[0];
+
+        let author = title.split(" --")[1];
+        title = title.split(" --")[0];     
+
+        if (!author) {
+          author = "Prof. Eric Klavins";
+        }
+
         let thought = this.props.content.split('\n')[2];
         let cite = this.props.content.split('\n')[3];
+
+        console.log("info: ", title, ", ", author, ", ", thought, ", ", cite)        
 
         html = `<div class='first-slide'>
           <div class='course'>PIMS 2026 Short Course</div>
           <div class='slide-title'>${title}</div>
           <div class='author'>
-            Prof. Eric Klavins (Instructor)</br></br>
-            Luz Elena Grisales Gómez and Nat Hurtig (Teaching Assistants)</br></br>
+            ${author}</br>
             University of Washington</br>
             Seattle, WA</br>
           </div>
@@ -67,8 +76,6 @@ class Slide extends React.PureComponent {
           html += `<div class='thought'>${thought}</div>`;
         }
       
-      
-
         html += `</div>`;
 
         if ( cite ) {
