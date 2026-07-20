@@ -1,1 +1,0 @@
-window.docContents[145].resolve({"/DemoTextbook/ListSet/#ListSet___contains":{"contents":"Checks whether x is found in xs\n\n\n","context":"","header":"ListSet.contains","id":"/DemoTextbook/ListSet/#ListSet___contains"}});

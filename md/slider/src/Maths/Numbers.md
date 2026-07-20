@@ -43,24 +43,24 @@ properties and builds up to these. For example,
 ```lean
 theorem zero_add (n : Nat) : add zero n = n := by rfl
 
-theorem add_zero (n : Nat) : add n zero = n := by induction n with <proofstate>['n : Nat\n⊢ add n zero = n']</proofstate>
+theorem add_zero (n : Nat) : add n zero = n := by induction n with
   | zero => rfl
-  | succ k ih => <proofstate>['case succ\nk : Nat\nih : add k zero = k\n⊢ add k.succ zero = k.succ']</proofstate>
-    unfold add <proofstate>['case succ\nk : Nat\nih : add k zero = k\n⊢ (add k zero).succ = k.succ']</proofstate>
+  | succ k ih =>
+    unfold add
     rw[ih]
 
-theorem add_succ (m n : Nat) : succ (add m n) = add m (succ n) := by <proofstate>['m n : Nat\n⊢ (add m n).succ = add m n.succ']</proofstate>
-  induction m with <proofstate>['m n : Nat\n⊢ (add m n).succ = add m n.succ']</proofstate>
+theorem add_succ (m n : Nat) : succ (add m n) = add m (succ n) := by
+  induction m with
   | zero => rw[zero_add,add]
-  | succ k ih => <proofstate>['case succ\nn k : Nat\nih : (add k n).succ = add k n.succ\n⊢ (add k.succ n).succ = add k.succ n.succ']</proofstate>
-     unfold add <proofstate>['case succ\nn k : Nat\nih : (add k n).succ = add k n.succ\n⊢ (add k n).succ.succ = (add k n.succ).succ']</proofstate>
+  | succ k ih =>
+     unfold add
      rw[ih]
 
-theorem add_comm (m n : Nat) : add m n = add n m := by <proofstate>['m n : Nat\n⊢ add m n = add n m']</proofstate>
-  induction m with <proofstate>['m n : Nat\n⊢ add m n = add n m']</proofstate>
+theorem add_comm (m n : Nat) : add m n = add n m := by
+  induction m with
   | zero => rw[zero_add,add_zero]
-  | succ k ih => <proofstate>['case succ\nn k : Nat\nih : add k n = add n k\n⊢ add k.succ n = add n k.succ']</proofstate>
-    conv => lhs; unfold add <proofstate>['n k : Nat\nih : add k n = add n k\n| (add k n).succ']</proofstate>
+  | succ k ih =>
+    conv => lhs; unfold add
     rw[ih,add_succ]
 ```
 
@@ -80,14 +80,14 @@ simple theorems. For example,
 ```lean
 theorem le_succ {n : Nat} : le n (succ n) := le.step le.refl
 
-theorem zero_is_least {n : Nat} : le zero n := by <proofstate>['n : Nat\n⊢ le zero n']</proofstate>
-  induction n with <proofstate>['n : Nat\n⊢ le zero n']</proofstate>
+theorem zero_is_least {n : Nat} : le zero n := by
+  induction n with
   | zero => exact le.refl
-  | succ k ih => <proofstate>['case succ\nk : Nat\nih : le zero k\n⊢ le zero k.succ']</proofstate>
+  | succ k ih =>
     exact le.step ih
 
-theorem zero_is_only_least (n : Nat) : le n zero ↔ n = zero := by <proofstate>['n : Nat\n⊢ le n zero ↔ n = zero']</proofstate>
-  constructor <proofstate>['case mp\nn : Nat\n⊢ le n zero → n = zero', 'case mpr\nn : Nat\n⊢ n = zero → le n zero']</proofstate>
+theorem zero_is_only_least (n : Nat) : le n zero ↔ n = zero := by
+  constructor
   · intro h; cases h; rfl
   · intro h; rw[h]; exact le.refl
 ```
@@ -96,58 +96,58 @@ Further Properties of Less-Than
 ===
 
 ```lean
-theorem succ_not_le_zero {k : Nat} : ¬le (succ k) zero := by <proofstate>['k : Nat\n⊢ ¬le k.succ zero']</proofstate>
-  --brief <proofstate>['k : Nat\n⊢ ¬le k.succ zero']</proofstate>
-  intro h <proofstate>['k : Nat\nh : le k.succ zero\n⊢ False']</proofstate>
+theorem succ_not_le_zero {k : Nat} : ¬le (succ k) zero := by
+  --brief
+  intro h
   cases h
   --unbrief
 
-theorem le_trans {x y z : Nat} : le x y → le y z → le x z := by <proofstate>['x y z : Nat\n⊢ le x y → le y z → le x z']</proofstate>
-  --brief <proofstate>['x y z : Nat\n⊢ le x y → le y z → le x z']</proofstate>
-  intro hxy hyz <proofstate>['x y z : Nat\nhxy : le x y\nhyz : le y z\n⊢ le x z']</proofstate>
-  induction hyz with <proofstate>['x y z : Nat\nhxy : le x y\nhyz : le y z\n⊢ le x z']</proofstate>
+theorem le_trans {x y z : Nat} : le x y → le y z → le x z := by
+  --brief
+  intro hxy hyz
+  induction hyz with
   | refl => exact hxy
-  | @step m hyz' ih => <proofstate>["case step\nx y z : Nat\nhxy : le x y\nm : Nat\nhyz' : le y m\nih : le x m\n⊢ le x m.succ"]</proofstate>
+  | @step m hyz' ih =>
     exact le.step ih
   --unbrief
 
 lemma le_succ_cases {x y : Nat} :
-  le x (succ y) → (x = succ y) ∨ le x y := by <proofstate>['x y : Nat\n⊢ le x y.succ → x = y.succ ∨ le x y']</proofstate>
-  --brief <proofstate>['x y : Nat\n⊢ le x y.succ → x = y.succ ∨ le x y']</proofstate>
-  intro h <proofstate>['x y : Nat\nh : le x y.succ\n⊢ x = y.succ ∨ le x y']</proofstate>
-  cases h with <proofstate>['x y : Nat\nh : le x y.succ\n⊢ x = y.succ ∨ le x y']</proofstate>
+  le x (succ y) → (x = succ y) ∨ le x y := by
+  --brief
+  intro h
+  cases h with
   | refl   => exact Or.inl rfl
   | step h => exact Or.inr h
   --unbrief
 
-lemma not_succ_le_self (n : Nat) : ¬ le (succ n) n := by <proofstate>['n : Nat\n⊢ ¬le n.succ n']</proofstate>
-  --brief <proofstate>['n : Nat\n⊢ ¬le n.succ n']</proofstate>
-  intro h <proofstate>['n : Nat\nh : le n.succ n\n⊢ False']</proofstate>
-  induction n with <proofstate>['n : Nat\nh : le n.succ n\n⊢ False']</proofstate>
+lemma not_succ_le_self (n : Nat) : ¬ le (succ n) n := by
+  --brief
+  intro h
+  induction n with
   | zero => exact succ_not_le_zero h
-  | succ k ih => <proofstate>['case succ\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\n⊢ False']</proofstate>
-    have := le_succ_cases (x := succ (succ k)) (y := k) h <proofstate>['case succ\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\nthis : k.succ.succ = k.succ ∨ le k.succ.succ k\n⊢ False']</proofstate>
-    cases this with <proofstate>['case succ\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\nthis : k.succ.succ = k.succ ∨ le k.succ.succ k\n⊢ False']</proofstate>
-    | inl h1 => <proofstate>['case succ.inl\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\nh1 : k.succ.succ = k.succ\n⊢ False']</proofstate>
-      rw[succ.injEq] at h1 <proofstate>['case succ.inl\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\nh1 : k.succ = k\n⊢ False']</proofstate>
-      rw[h1] at ih <proofstate>['case succ.inl\nk : Nat\nih : le k k → False\nh : le k.succ.succ k.succ\nh1 : k.succ = k\n⊢ False']</proofstate>
+  | succ k ih =>
+    have := le_succ_cases (x := succ (succ k)) (y := k) h
+    cases this with
+    | inl h1 =>
+      rw[succ.injEq] at h1
+      rw[h1] at ih
       exact ih le.refl
-    | inr h1 => <proofstate>['case succ.inr\nk : Nat\nih : le k.succ k → False\nh : le k.succ.succ k.succ\nh1 : le k.succ.succ k\n⊢ False']</proofstate>
+    | inr h1 =>
       exact ih (le_trans le_succ h1)
   --unbrief
 
-theorem le_antisymm {x y : Nat} : le x y → le y x → x = y := by <proofstate>['x y : Nat\n⊢ le x y → le y x → x = y']</proofstate>
-  --brief <proofstate>['x y : Nat\n⊢ le x y → le y x → x = y']</proofstate>
-  intro hxy hyx <proofstate>['x y : Nat\nhxy : le x y\nhyx : le y x\n⊢ x = y']</proofstate>
-  cases hxy with <proofstate>['x y : Nat\nhxy : le x y\nhyx : le y x\n⊢ x = y']</proofstate>
+theorem le_antisymm {x y : Nat} : le x y → le y x → x = y := by
+  --brief
+  intro hxy hyx
+  cases hxy with
   | refl => repeat rfl
-  | @step k hk => <proofstate>['case step\nx k : Nat\nhk : le x k\nhyx : le k.succ x\n⊢ x = k.succ']</proofstate>
-    cases hyx with <proofstate>['case step\nx k : Nat\nhk : le x k\nhyx : le k.succ x\n⊢ x = k.succ']</proofstate>
+  | @step k hk =>
+    cases hyx with
     | refl => rfl
-    | @step j hj => <proofstate>['case step.step\nk j : Nat\nhj : le k.succ j\nhk : le j.succ k\n⊢ j.succ = k.succ']</proofstate>
-      apply False.elim <proofstate>['case step.step.h\nk j : Nat\nhj : le k.succ j\nhk : le j.succ k\n⊢ False']</proofstate>
-      apply not_succ_le_self k <proofstate>['case step.step.h\nk j : Nat\nhj : le k.succ j\nhk : le j.succ k\n⊢ le k.succ k']</proofstate>
-      apply le_trans hj (le_trans _ hk) <proofstate>['k j : Nat\nhj : le k.succ j\nhk : le j.succ k\n⊢ le j j.succ']</proofstate>
+    | @step j hj =>
+      apply False.elim
+      apply not_succ_le_self k
+      apply le_trans hj (le_trans _ hk)
       exact le_succ
   --unbrief
 ```
@@ -237,13 +237,13 @@ Forming the Quotient
 First we prove `eq` is an equivalence relation.
 
 ```lean
-theorem eq_refl (u : Pair) : eq u u := by <proofstate>['u : Pair\n⊢ eq u u']</proofstate>
+theorem eq_refl (u : Pair) : eq u u := by
   simp[eq]; linarith
 
-theorem eq_symm {v w : Pair} : eq v w → eq w v := by <proofstate>['v w : Pair\n⊢ eq v w → eq w v']</proofstate>
+theorem eq_symm {v w : Pair} : eq v w → eq w v := by
   intro h; simp_all[eq]; linarith
 
-theorem eq_trans {u v w : Pair} : eq u v → eq v w → eq u w := by <proofstate>['u v w : Pair\n⊢ eq u v → eq v w → eq u w']</proofstate>
+theorem eq_trans {u v w : Pair} : eq u v → eq v w → eq u w := by
   intro h1 h2; simp_all[eq]; linarith
 
 instance eq_equiv : Equivalence eq := ⟨ eq_refl, eq_symm, eq_trans ⟩
@@ -263,8 +263,8 @@ Using The New Bint Type
 Basic examples now work
 
 ```lean
-example : mk ⟨ 1, 2 ⟩ = mk ⟨ 2, 3 ⟩ := by <proofstate>['⊢ mk { p := 1, q := 2 } = mk { p := 2, q := 3 }']</proofstate>
-  apply Quotient.sound <proofstate>['case a\n⊢ { p := 1, q := 2 } ≈ { p := 2, q := 3 }']</proofstate>
+example : mk ⟨ 1, 2 ⟩ = mk ⟨ 2, 3 ⟩ := by
+  apply Quotient.sound
   rfl
 ```
  And we can instantiate some type classes: 
@@ -287,9 +287,9 @@ We can lift operations on `Pair` to `Bint`. For example, here is negation:
 def pre_negate (x : Pair) : Pair := ⟨ x.q, x.p ⟩
 
 theorem pre_negate_respects (x y : Pair) :
-  x ≈ y → mk (pre_negate x) = mk (pre_negate y) := by <proofstate>['x y : Pair\n⊢ x ≈ y → mk (pre_negate x) = mk (pre_negate y)']</proofstate>
-  intro h <proofstate>['x y : Pair\nh : x ≈ y\n⊢ mk (pre_negate x) = mk (pre_negate y)']</proofstate>
-  apply Quotient.sound <proofstate>['case a\nx y : Pair\nh : x ≈ y\n⊢ pre_negate x ≈ pre_negate y']</proofstate>
+  x ≈ y → mk (pre_negate x) = mk (pre_negate y) := by
+  intro h
+  apply Quotient.sound
   exact h.symm
 
 def pre_negate' (x : Pair) : Bint := mk (pre_negate x)
@@ -311,9 +311,9 @@ We convert `Bint` to Lean's `Int` using `Quotient.lift` again.
 
 ```lean
 def bint_to_int : Bint → Int :=
-  Quotient.lift (fun p => (p.p : Int) - p.q) (by <proofstate>['⊢ ∀ (a b : Pair), a ≈ b → (fun p ↦ ↑p.p - ↑p.q) a = (fun p ↦ ↑p.p - ↑p.q) b']</proofstate>
-    intro a b h <proofstate>['a b : Pair\nh : a ≈ b\n⊢ (fun p ↦ ↑p.p - ↑p.q) a = (fun p ↦ ↑p.p - ↑p.q) b']</proofstate>
-    have : a.p + b.q = a.q + b.p := h <proofstate>['a b : Pair\nh : a ≈ b\nthis : a.p + b.q = a.q + b.p\n⊢ (fun p ↦ ↑p.p - ↑p.q) a = (fun p ↦ ↑p.p - ↑p.q) b']</proofstate>
+  Quotient.lift (fun p => (p.p : Int) - p.q) (by
+    intro a b h
+    have : a.p + b.q = a.q + b.p := h
     linarith)
 ```
  Converting Lean's `Int` to `Bint` uses the constructors for `Int`. 
@@ -336,15 +336,15 @@ Transporting Theorems
 ===
 
 ```lean
-lemma bint_int_equiv_neg (x : Bint) : bint_int_equiv (-x) = -bint_int_equiv x := by <proofstate>['x : Bint\n⊢ bint_int_equiv (-x) = -bint_int_equiv x']</proofstate>
-  induction x using Quotient.inductionOn with <proofstate>['x : Bint\n⊢ bint_int_equiv (-x) = -bint_int_equiv x']</proofstate>
-  | h y => <proofstate>['case h\ny : Pair\n⊢ bint_int_equiv (-⟦y⟧) = -bint_int_equiv ⟦y⟧']</proofstate>
-    simp?[bint_to_int,bint_int_equiv] <proofstate>['case h\ny : Pair\n⊢ Quotient.lift (fun p ↦ ↑p.p - ↑p.q) bint_to_int._proof_1 (-⟦y⟧) = ↑y.q - ↑y.p']</proofstate>
+lemma bint_int_equiv_neg (x : Bint) : bint_int_equiv (-x) = -bint_int_equiv x := by
+  induction x using Quotient.inductionOn with
+  | h y =>
+    simp?[bint_to_int,bint_int_equiv]
     exact Int.neg_inj.mp rfl
 
-theorem neg_neg (x : Bint) : - -x = x := by <proofstate>['x : Bint\n⊢ - -x = x']</proofstate>
-  apply bint_int_equiv.injective <proofstate>['case a\nx : Bint\n⊢ bint_int_equiv (- -x) = bint_int_equiv x']</proofstate>
-  rw [bint_int_equiv_neg, bint_int_equiv_neg] <proofstate>['case a\nx : Bint\n⊢ - -bint_int_equiv x = bint_int_equiv x']</proofstate>
+theorem neg_neg (x : Bint) : - -x = x := by
+  apply bint_int_equiv.injective
+  rw [bint_int_equiv_neg, bint_int_equiv_neg]
   exact Int.neg_neg (bint_int_equiv x)
 ```
 
@@ -416,20 +416,20 @@ structure CauchySeq where
 ```lean
 instance Cauchy.zero_inst : Zero CauchySeq := ⟨
   fun _ => 0,
-  by <proofstate>['⊢ ∀ ε > 0, ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun x ↦ 0) n - (fun x ↦ 0) m| < ε']</proofstate>
-    intro ε hε <proofstate>['ε : ℚ\nhε : ε > 0\n⊢ ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun x ↦ 0) n - (fun x ↦ 0) m| < ε']</proofstate>
-    use 1 <proofstate>['case h\nε : ℚ\nhε : ε > 0\n⊢ ∀ (n m : ℕ), n > 1 → m > 1 → |(fun x ↦ 0) n - (fun x ↦ 0) m| < ε']</proofstate>
-    intro n m hn hm <proofstate>['case h\nε : ℚ\nhε : ε > 0\nn m : ℕ\nhn : n > 1\nhm : m > 1\n⊢ |(fun x ↦ 0) n - (fun x ↦ 0) m| < ε']</proofstate>
+  by
+    intro ε hε
+    use 1
+    intro n m hn hm
     simp[hε]
 ⟩
 
 --hide
 instance Cauchy.one_inst : One CauchySeq := ⟨
   fun _ => 1,
-  by <proofstate>['⊢ ∀ ε > 0, ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun x ↦ 1) n - (fun x ↦ 1) m| < ε']</proofstate>
-    intro ε hε <proofstate>['ε : ℚ\nhε : ε > 0\n⊢ ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun x ↦ 1) n - (fun x ↦ 1) m| < ε']</proofstate>
-    use 1 <proofstate>['case h\nε : ℚ\nhε : ε > 0\n⊢ ∀ (n m : ℕ), n > 1 → m > 1 → |(fun x ↦ 1) n - (fun x ↦ 1) m| < ε']</proofstate>
-    intro n m hn hm <proofstate>['case h\nε : ℚ\nhε : ε > 0\nn m : ℕ\nhn : n > 1\nhm : m > 1\n⊢ |(fun x ↦ 1) n - (fun x ↦ 1) m| < ε']</proofstate>
+  by
+    intro ε hε
+    use 1
+    intro n m hn hm
     simp[hε]
 ⟩
 --unhide
@@ -447,23 +447,23 @@ The following is a standard proof from most Real Analysis texts:
 
 ```lean
 def Cauchy.add (s1 s2 : CauchySeq) : CauchySeq := ⟨
-  fun n => s1.σ n +  s2.σ n, by <proofstate>['s1 s2 : CauchySeq\n⊢ ∀ ε > 0, ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun n ↦ s1.σ n + s2.σ n) n - (fun n ↦ s1.σ n + s2.σ n) m| < ε']</proofstate>
-  intro ε hε <proofstate>['s1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\n⊢ ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun n ↦ s1.σ n + s2.σ n) n - (fun n ↦ s1.σ n + s2.σ n) m| < ε']</proofstate>
-  have ⟨ N1, h1' ⟩ := s1.is_cauchy (ε/2) (by exact half_pos hε) <proofstate>["s1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\n⊢ ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun n ↦ s1.σ n + s2.σ n) n - (fun n ↦ s1.σ n + s2.σ n) m| < ε"]</proofstate>
-  have ⟨ N2, h2' ⟩ := s2.is_cauchy (ε/2) (by exact half_pos hε) <proofstate>["s1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\nN2 : ℕ\nh2' : ∀ (n m : ℕ), n > N2 → m > N2 → |s2.σ n - s2.σ m| < ε / 2\n⊢ ∃ N, ∀ (n m : ℕ), n > N → m > N → |(fun n ↦ s1.σ n + s2.σ n) n - (fun n ↦ s1.σ n + s2.σ n) m| < ε"]</proofstate>
-  use N1 + N2 <proofstate>["case h\ns1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\nN2 : ℕ\nh2' : ∀ (n m : ℕ), n > N2 → m > N2 → |s2.σ n - s2.σ m| < ε / 2\n⊢ ∀ (n m : ℕ), n > N1 + N2 → m > N1 + N2 → |(fun n ↦ s1.σ n + s2.σ n) n - (fun n ↦ s1.σ n + s2.σ n) m| < ε"]</proofstate>
-  intro m n gm gn <proofstate>["case h\ns1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\nN2 : ℕ\nh2' : ∀ (n m : ℕ), n > N2 → m > N2 → |s2.σ n - s2.σ m| < ε / 2\nm n : ℕ\ngm : m > N1 + N2\ngn : n > N1 + N2\n⊢ |(fun n ↦ s1.σ n + s2.σ n) m - (fun n ↦ s1.σ n + s2.σ n) n| < ε"]</proofstate>
-  have h1'' := h1' n m (by linarith) (by linarith) <proofstate>["case h\ns1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\nN2 : ℕ\nh2' : ∀ (n m : ℕ), n > N2 → m > N2 → |s2.σ n - s2.σ m| < ε / 2\nm n : ℕ\ngm : m > N1 + N2\ngn : n > N1 + N2\nh1'' : |s1.σ n - s1.σ m| < ε / 2\n⊢ |(fun n ↦ s1.σ n + s2.σ n) m - (fun n ↦ s1.σ n + s2.σ n) n| < ε"]</proofstate>
-  have h2'' := h2' n m (by linarith) (by linarith) <proofstate>["case h\ns1 s2 : CauchySeq\nε : ℚ\nhε : ε > 0\nN1 : ℕ\nh1' : ∀ (n m : ℕ), n > N1 → m > N1 → |s1.σ n - s1.σ m| < ε / 2\nN2 : ℕ\nh2' : ∀ (n m : ℕ), n > N2 → m > N2 → |s2.σ n - s2.σ m| < ε / 2\nm n : ℕ\ngm : m > N1 + N2\ngn : n > N1 + N2\nh1'' : |s1.σ n - s1.σ m| < ε / 2\nh2'' : |s2.σ n - s2.σ m| < ε / 2\n⊢ |(fun n ↦ s1.σ n + s2.σ n) m - (fun n ↦ s1.σ n + s2.σ n) n| < ε"]</proofstate>
-  simp_all[abs_lt] <proofstate>["case h\ns1 s2 : CauchySeq\nε : ℚ\nN1 N2 m n : ℕ\nhε : 0 < ε\nh1' : ∀ (n m : ℕ), N1 < n → N1 < m → s1.σ m < ε / 2 + s1.σ n ∧ s1.σ n - s1.σ m < ε / 2\nh2' : ∀ (n m : ℕ), N2 < n → N2 < m → s2.σ m < ε / 2 + s2.σ n ∧ s2.σ n - s2.σ m < ε / 2\ngm : N1 + N2 < m\ngn : N1 + N2 < n\nh1'' : s1.σ m < ε / 2 + s1.σ n ∧ s1.σ n - s1.σ m < ε / 2\nh2'' : s2.σ m < ε / 2 + s2.σ n ∧ s2.σ n - s2.σ m < ε / 2\n⊢ s1.σ n + s2.σ n < ε + (s1.σ m + s2.σ m) ∧ s1.σ m + s2.σ m - (s1.σ n + s2.σ n) < ε"]</proofstate>
+  fun n => s1.σ n +  s2.σ n, by
+  intro ε hε
+  have ⟨ N1, h1' ⟩ := s1.is_cauchy (ε/2) (by exact half_pos hε)
+  have ⟨ N2, h2' ⟩ := s2.is_cauchy (ε/2) (by exact half_pos hε)
+  use N1 + N2
+  intro m n gm gn
+  have h1'' := h1' n m (by linarith) (by linarith)
+  have h2'' := h2' n m (by linarith) (by linarith)
+  simp_all[abs_lt]
   exact ⟨ by linarith, by linarith ⟩
 ⟩
 ```
  We can show, for example 
 ```lean
-theorem zero_plus_zero : Cauchy.add 0 0 = 0 := by <proofstate>['⊢ Cauchy.add 0 0 = 0']</proofstate>
-  ext n <proofstate>['case σ.h\nn : ℕ\n⊢ (Cauchy.add 0 0).σ n = CauchySeq.σ 0 n']</proofstate>
-  simp[Cauchy.add] <proofstate>['case σ.h\nn : ℕ\n⊢ CauchySeq.σ 0 n = 0']</proofstate>
+theorem zero_plus_zero : Cauchy.add 0 0 = 0 := by
+  ext n
+  simp[Cauchy.add]
   rfl
 ```
 
@@ -479,12 +479,12 @@ def Cauchy.eq (x y : CauchySeq) :=
 ```
  One can show, for example: 
 ```lean
-theorem Cauchy.eq_refl {x : CauchySeq} : Cauchy.eq x x := by <proofstate>['x : CauchySeq\n⊢ eq x x']</proofstate>
-  intro ε hε <proofstate>['x : CauchySeq\nε : ℚ\nhε : ε > 0\n⊢ ∃ N, ∀ (m n : ℕ), m > N → n > N → |x.σ n - x.σ m| < ε']</proofstate>
-  have ⟨ N, h ⟩ := x.is_cauchy ε hε <proofstate>['x : CauchySeq\nε : ℚ\nhε : ε > 0\nN : ℕ\nh : ∀ (n m : ℕ), n > N → m > N → |x.σ n - x.σ m| < ε\n⊢ ∃ N, ∀ (m n : ℕ), m > N → n > N → |x.σ n - x.σ m| < ε']</proofstate>
-  use N <proofstate>['case h\nx : CauchySeq\nε : ℚ\nhε : ε > 0\nN : ℕ\nh : ∀ (n m : ℕ), n > N → m > N → |x.σ n - x.σ m| < ε\n⊢ ∀ (m n : ℕ), m > N → n > N → |x.σ n - x.σ m| < ε']</proofstate>
-  intro m n hm hn <proofstate>['case h\nx : CauchySeq\nε : ℚ\nhε : ε > 0\nN : ℕ\nh : ∀ (n m : ℕ), n > N → m > N → |x.σ n - x.σ m| < ε\nm n : ℕ\nhm : m > N\nhn : n > N\n⊢ |x.σ n - x.σ m| < ε']</proofstate>
-  have h' := h n m hn hm <proofstate>["case h\nx : CauchySeq\nε : ℚ\nhε : ε > 0\nN : ℕ\nh : ∀ (n m : ℕ), n > N → m > N → |x.σ n - x.σ m| < ε\nm n : ℕ\nhm : m > N\nhn : n > N\nh' : |x.σ n - x.σ m| < ε\n⊢ |x.σ n - x.σ m| < ε"]</proofstate>
+theorem Cauchy.eq_refl {x : CauchySeq} : Cauchy.eq x x := by
+  intro ε hε
+  have ⟨ N, h ⟩ := x.is_cauchy ε hε
+  use N
+  intro m n hm hn
+  have h' := h n m hn hm
   exact h'
 ```
  And eventually prove `Cauchy.eq` is an equivalence relation so that
@@ -587,10 +587,10 @@ def ofRat (q : ℚ) : DCut := ⟨
   by use q-1; simp[odown],
   by use q+1; simp[odown],
   by intro x y ⟨ hx, hy ⟩; simp_all[odown]; linarith,
-  by <proofstate>['q : ℚ\n⊢ ∀ x ∈ odown q, ∃ y ∈ odown q, x < y']</proofstate>
-    intro x hx <proofstate>['q x : ℚ\nhx : x ∈ odown q\n⊢ ∃ y ∈ odown q, x < y']</proofstate>
-    use (x+q)/2 <proofstate>['case h\nq x : ℚ\nhx : x ∈ odown q\n⊢ (x + q) / 2 ∈ odown q ∧ x < (x + q) / 2']</proofstate>
-    simp_all[odown] <proofstate>['case h\nq x : ℚ\nhx : x < q\n⊢ (x + q) / 2 < q ∧ x < (x + q) / 2']</proofstate>
+  by
+    intro x hx
+    use (x+q)/2
+    simp_all[odown]
     exact ⟨ by linarith, by linarith ⟩
   ⟩
 ```
@@ -613,10 +613,10 @@ instance inhabited_inst : Inhabited DCut := ⟨ 0 ⟩
 ```
  Nontriviality 
 ```lean
-theorem zero_ne_one : (0:DCut) ≠ 1 := by <proofstate>['⊢ 0 ≠ 1']</proofstate>
-  intro h <proofstate>['h : 0 = 1\n⊢ False']</proofstate>
-  simp[DCut.ext_iff,odown,Set.ext_iff] at h <proofstate>['h : ∀ (x : ℚ), x ∈ A 0 ↔ x ∈ A 1\n⊢ False']</proofstate>
-  have h0 := h (1/2) <proofstate>['h : ∀ (x : ℚ), x ∈ A 0 ↔ x ∈ A 1\nh0 : 1 / 2 ∈ A 0 ↔ 1 / 2 ∈ A 1\n⊢ False']</proofstate>
+theorem zero_ne_one : (0:DCut) ≠ 1 := by
+  intro h
+  simp[DCut.ext_iff,odown,Set.ext_iff] at h
+  have h0 := h (1/2)
   have h1 : (1:ℚ)/2 < 1 := by linarith
   have h2 : ¬(1:ℚ)/2 < 0 := by linarith
   exact h2 (h0.mpr h1)
@@ -634,9 +634,9 @@ def presum (a b : DCut) :=  { z | ∃ x ∈ a.A, ∃ y ∈ b.A, x+y=z }
 ```
  The first property required be a cut is straigtforward: 
 ```lean
-theorem presum_ne {a b : DCut} :  ∃ q, q ∈ presum a b := by <proofstate>['a b : DCut\n⊢ ∃ q, q ∈ presum a b']</proofstate>
-  obtain ⟨ x, hx ⟩ := a.ne <proofstate>['a b : DCut\nx : ℚ\nhx : x ∈ a.A\n⊢ ∃ q, q ∈ presum a b']</proofstate>
-  obtain ⟨ y, hy ⟩ := b.ne <proofstate>['a b : DCut\nx : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\n⊢ ∃ q, q ∈ presum a b']</proofstate>
+theorem presum_ne {a b : DCut} :  ∃ q, q ∈ presum a b := by
+  obtain ⟨ x, hx ⟩ := a.ne
+  obtain ⟨ y, hy ⟩ := b.ne
   exact ⟨ x+y, ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, by linarith ⟩ ⟩ ⟩ ⟩ ⟩
 ```
 
@@ -649,22 +649,22 @@ We start with some helper theorems.
 theorem not_in_a_in_b {c : DCut} {q : ℚ} : q ∉ c.A → q ∈ c.B := by simp[B]
 theorem not_in_b_in_a {c : DCut} {q : ℚ} : q ∉ c.B → q ∈ c.A := by simp[B]
 
-theorem b_gt_a {c : DCut} {x y : ℚ} : x ∈ c.A → y ∈ c.B → x < y := by <proofstate>['c : DCut\nx y : ℚ\n⊢ x ∈ c.A → y ∈ c.B → x < y']</proofstate>
-  intro hx hy <proofstate>['c : DCut\nx y : ℚ\nhx : x ∈ c.A\nhy : y ∈ c.B\n⊢ x < y']</proofstate>
-  simp[B] at hy <proofstate>['c : DCut\nx y : ℚ\nhx : x ∈ c.A\nhy : y ∉ c.A\n⊢ x < y']</proofstate>
-  by_contra h <proofstate>['c : DCut\nx y : ℚ\nhx : x ∈ c.A\nhy : y ∉ c.A\nh : ¬x < y\n⊢ False']</proofstate>
+theorem b_gt_a {c : DCut} {x y : ℚ} : x ∈ c.A → y ∈ c.B → x < y := by
+  intro hx hy
+  simp[B] at hy
+  by_contra h
   exact hy (c.dc y x ⟨ Rat.not_lt.mp h, hx ⟩)
 ```
  Then we have, 
 ```lean
-theorem presum_nf {a b : DCut} : ∃ q, q ∉ presum a b := by <proofstate>['a b : DCut\n⊢ ∃ q, q ∉ presum a b']</proofstate>
-    obtain ⟨ x, hx ⟩ := a.nf <proofstate>['a b : DCut\nx : ℚ\nhx : x ∉ a.A\n⊢ ∃ q, q ∉ presum a b']</proofstate>
-    obtain ⟨ y, hy ⟩ := b.nf <proofstate>['a b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\n⊢ ∃ q, q ∉ presum a b']</proofstate>
-    use x+y <proofstate>['case h\na b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\n⊢ x + y ∉ presum a b']</proofstate>
-    intro h <proofstate>['case h\na b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\nh : x + y ∈ presum a b\n⊢ False']</proofstate>
-    obtain ⟨ s, ⟨ hs, ⟨ t, ⟨ ht, hst ⟩ ⟩ ⟩ ⟩ := h <proofstate>['case h\na b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\ns : ℚ\nhs : s ∈ a.A\nt : ℚ\nht : t ∈ b.A\nhst : s + t = x + y\n⊢ False']</proofstate>
-    have hs' := b_gt_a hs (not_in_a_in_b hx) <proofstate>["case h\na b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\ns : ℚ\nhs : s ∈ a.A\nt : ℚ\nht : t ∈ b.A\nhst : s + t = x + y\nhs' : s < x\n⊢ False"]</proofstate>
-    have ht' := b_gt_a ht (not_in_a_in_b hy) <proofstate>["case h\na b : DCut\nx : ℚ\nhx : x ∉ a.A\ny : ℚ\nhy : y ∉ b.A\ns : ℚ\nhs : s ∈ a.A\nt : ℚ\nht : t ∈ b.A\nhst : s + t = x + y\nhs' : s < x\nht' : t < y\n⊢ False"]</proofstate>
+theorem presum_nf {a b : DCut} : ∃ q, q ∉ presum a b := by
+    obtain ⟨ x, hx ⟩ := a.nf
+    obtain ⟨ y, hy ⟩ := b.nf
+    use x+y
+    intro h
+    obtain ⟨ s, ⟨ hs, ⟨ t, ⟨ ht, hst ⟩ ⟩ ⟩ ⟩ := h
+    have hs' := b_gt_a hs (not_in_a_in_b hx)
+    have ht' := b_gt_a ht (not_in_a_in_b hy)
     linarith
 ```
 
@@ -673,19 +673,19 @@ The Sum of Two Cuts is Open
 
 ```lean
 theorem presum_op {a b : DCut}
-  : ∀ x ∈ presum a b, ∃ y ∈ presum a b, x < y := by <proofstate>['a b : DCut\n⊢ ∀ x ∈ presum a b, ∃ y ∈ presum a b, x < y']</proofstate>
-  intro c hc <proofstate>['a b : DCut\nc : ℚ\nhc : c ∈ presum a b\n⊢ ∃ y ∈ presum a b, c < y']</proofstate>
-  simp_all[presum] <proofstate>['a b : DCut\nc : ℚ\nhc : ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = c\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1']</proofstate>
-  obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, h ⟩ ⟩ ⟩ ⟩ := hc <proofstate>['a b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1']</proofstate>
-  have hao := a.op <proofstate>['a b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1']</proofstate>
-  have hbo := b.op <proofstate>['a b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1']</proofstate>
-  obtain ⟨ x', hx', hxx' ⟩ := hao x hx <proofstate>["a b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1"]</proofstate>
-  obtain ⟨ y', hy', hyy' ⟩ := hbo y hy <proofstate>["a b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, c < a_1 + b_1"]</proofstate>
-  use x' <proofstate>["case h\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ x' ∈ a.A ∧ ∃ b_1 ∈ b.A, c < x' + b_1"]</proofstate>
-  apply And.intro <proofstate>["case h.left\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ x' ∈ a.A", "case h.right\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ ∃ b_1 ∈ b.A, c < x' + b_1"]</proofstate>
+  : ∀ x ∈ presum a b, ∃ y ∈ presum a b, x < y := by
+  intro c hc
+  simp_all[presum]
+  obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, h ⟩ ⟩ ⟩ ⟩ := hc
+  have hao := a.op
+  have hbo := b.op
+  obtain ⟨ x', hx', hxx' ⟩ := hao x hx
+  obtain ⟨ y', hy', hyy' ⟩ := hbo y hy
+  use x'
+  apply And.intro
   · exact hx'
-  · use y' <proofstate>["case h\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ y' ∈ b.A ∧ c < x' + y'"]</proofstate>
-    apply And.intro <proofstate>["case h.left\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ y' ∈ b.A", "case h.right\na b : DCut\nc x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = c\nhao : ∀ x ∈ a.A, ∃ y ∈ a.A, x < y\nhbo : ∀ x ∈ b.A, ∃ y ∈ b.A, x < y\nx' : ℚ\nhx' : x' ∈ a.A\nhxx' : x < x'\ny' : ℚ\nhy' : y' ∈ b.A\nhyy' : y < y'\n⊢ c < x' + y'"]</proofstate>
+  · use y'
+    apply And.intro
     · exact hy'
     · linarith
 ```
@@ -695,16 +695,16 @@ The Sum of Two Cuts is Downward Closed
 
 ```lean
 theorem presum_dc {a b : DCut }
-  : ∀ (x y : ℚ), x ≤ y ∧ y ∈ presum a b → x ∈ presum a b := by <proofstate>['a b : DCut\n⊢ ∀ (x y : ℚ), x ≤ y ∧ y ∈ presum a b → x ∈ presum a b']</proofstate>
-  intro s t ⟨ h1, h2 ⟩ <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nh2 : t ∈ presum a b\n⊢ s ∈ presum a b']</proofstate>
-  simp_all[presum] <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nh2 : ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = t\n⊢ ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = s']</proofstate>
-  obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, h ⟩ ⟩ ⟩ ⟩ := h2 <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nx : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = t\n⊢ ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = s']</proofstate>
- <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nx : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = t\n⊢ ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = s']</proofstate>
-  have hyts : y - (t - s) ∈ b.A := by <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nx : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = t\n⊢ y - (t - s) ∈ b.A']</proofstate>
+  : ∀ (x y : ℚ), x ≤ y ∧ y ∈ presum a b → x ∈ presum a b := by
+  intro s t ⟨ h1, h2 ⟩
+  simp_all[presum]
+  obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, h ⟩ ⟩ ⟩ ⟩ := h2
+
+  have hyts : y - (t - s) ∈ b.A := by
     have h3 : 0 ≤ t-s := by linarith
     have h4 : y - (t-s) ≤ y := by linarith
     exact b.dc (y-(t-s)) y ⟨h4,hy⟩
- <proofstate>['a b : DCut\ns t : ℚ\nh1 : s ≤ t\nx : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nh : x + y = t\nhyts : y - (t - s) ∈ b.A\n⊢ ∃ x ∈ a.A, ∃ y ∈ b.A, x + y = s']</proofstate>
+
   exact ⟨ x, ⟨ hx, ⟨ y - (t-s), ⟨ hyts, by linarith ⟩ ⟩ ⟩ ⟩
 ```
 
@@ -722,17 +722,17 @@ instance add_inst : Add DCut := ⟨ sum ⟩
 And here is an example property, which requires mainly rearrangment.
 
 ```lean
-theorem sum_assoc {a b c : DCut} : (a+b)+c = a + (b+c) := by <proofstate>['a b c : DCut\n⊢ a + b + c = a + (b + c)']</proofstate>
-  simp[hadd_inst,sum] <proofstate>['a b c : DCut\n⊢ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c =\n    presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ }']</proofstate>
-  ext q <proofstate>['case h\na b c : DCut\nq : ℚ\n⊢ q ∈ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c ↔\n    q ∈ presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ }']</proofstate>
-  constructor <proofstate>['case h.mp\na b c : DCut\nq : ℚ\n⊢ q ∈ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c →\n    q ∈ presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ }', 'case h.mpr\na b c : DCut\nq : ℚ\n⊢ q ∈ presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } →\n    q ∈ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c']</proofstate>
-  . intro hq <proofstate>['case h.mp\na b c : DCut\nq : ℚ\nhq : q ∈ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c\n⊢ q ∈ presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ }']</proofstate>
-    simp_all[presum] <proofstate>['case h.mp\na b c : DCut\nq : ℚ\nhq : ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, ∃ y ∈ c.A, a_1 + b_1 + y = q\n⊢ ∃ x ∈ a.A, ∃ a ∈ b.A, ∃ b ∈ c.A, x + (a + b) = q']</proofstate>
-    obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, hsum ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ := hq <proofstate>['case h.mp\na b c : DCut\nq x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nz : ℚ\nhz : z ∈ c.A\nhsum : x + y + z = q\n⊢ ∃ x ∈ a.A, ∃ a ∈ b.A, ∃ b ∈ c.A, x + (a + b) = q']</proofstate>
+theorem sum_assoc {a b c : DCut} : (a+b)+c = a + (b+c) := by
+  simp[hadd_inst,sum]
+  ext q
+  constructor
+  . intro hq
+    simp_all[presum]
+    obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, hsum ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ := hq
     exact ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, by linarith ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
-  . intro hq <proofstate>['case h.mpr\na b c : DCut\nq : ℚ\nhq : q ∈ presum a { A := presum b c, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ }\n⊢ q ∈ presum { A := presum a b, ne := ⋯, nf := ⋯, dc := ⋯, op := ⋯ } c']</proofstate>
-    simp_all[presum] <proofstate>['case h.mpr\na b c : DCut\nq : ℚ\nhq : ∃ x ∈ a.A, ∃ a ∈ b.A, ∃ b ∈ c.A, x + (a + b) = q\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, ∃ y ∈ c.A, a_1 + b_1 + y = q']</proofstate>
-    obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, hsum ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ := hq <proofstate>['case h.mpr\na b c : DCut\nq x : ℚ\nhx : x ∈ a.A\ny : ℚ\nhy : y ∈ b.A\nz : ℚ\nhz : z ∈ c.A\nhsum : x + (y + z) = q\n⊢ ∃ a_1 ∈ a.A, ∃ b_1 ∈ b.A, ∃ y ∈ c.A, a_1 + b_1 + y = q']</proofstate>
+  . intro hq
+    simp_all[presum]
+    obtain ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, hsum ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ := hq
     exact ⟨ x, ⟨ hx, ⟨ y, ⟨ hy, ⟨ z, ⟨ hz, by linarith ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
 ```
 

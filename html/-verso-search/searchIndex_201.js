@@ -1,1 +1,0 @@
-window.docContents[201].resolve({"/DemoTextbook/ListSet/#mod-doc-DemoTextbook___ListSet-26-0":{"contents":"Insertion\n\n","context":"","header":"DemoTextbook.ListSet","id":"/DemoTextbook/ListSet/#mod-doc-DemoTextbook___ListSet-26-0"}});

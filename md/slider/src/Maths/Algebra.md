@@ -200,15 +200,15 @@ A super useful property for proving identities is:
 
 
 ```lean
-theorem Group.cancel_left : a + b = a + c → b = c := by <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\n⊢ a + b = a + c → b = c']</proofstate>
-  intro h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : a + b = a + c\n⊢ b = c']</proofstate>
-  apply congrArg (fun t => -a + t) at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : -a + (a + b) = -a + (a + c)\n⊢ b = c']</proofstate>
-  rw[←assoc] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : -a + a + b = -a + (a + c)\n⊢ b = c']</proofstate>
-  rw[inv_left] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : e + b = -a + (a + c)\n⊢ b = c']</proofstate>
-  rw[id_left] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : b = -a + (a + c)\n⊢ b = c']</proofstate>
-  rw[←assoc] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : b = -a + a + c\n⊢ b = c']</proofstate>
-  rw[inv_left] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : b = e + c\n⊢ b = c']</proofstate>
-  rw[id_left] at h <proofstate>['G : Type u\ninst✝ : Group G\na b c : G\nh : b = c\n⊢ b = c']</proofstate>
+theorem Group.cancel_left : a + b = a + c → b = c := by
+  intro h
+  apply congrArg (fun t => -a + t) at h
+  rw[←assoc] at h
+  rw[inv_left] at h
+  rw[id_left] at h
+  rw[←assoc] at h
+  rw[inv_left] at h
+  rw[id_left] at h
   exact h
 ```
  Or you can write `simp_all only [←assoc,inv_left,id_left]`. 
@@ -222,8 +222,8 @@ are applying very clearly.
 For example, we can show `id_right` is derivable.
 
 ```lean
-theorem Group.id_right : a + e = a := by <proofstate>['G : Type u\ninst✝ : Group G\na : G\n⊢ a + e = a']</proofstate>
-  apply cancel_left (a := -a) <proofstate>['G : Type u\ninst✝ : Group G\na : G\n⊢ -a + (a + e) = -a + a']</proofstate>
+theorem Group.id_right : a + e = a := by
+  apply cancel_left (a := -a)
   calc  -a +  (a + e)
   _   = (-a + a) + e   := by rw[assoc]
   _   = (e + e : G)    := by rw[inv_left]
@@ -232,8 +232,8 @@ theorem Group.id_right : a + e = a := by <proofstate>['G : Type u\ninst✝ : Gro
 ```
  which can be done with `simp` as well. You just have to tell `simp` which way to associate.  
 ```lean
-example : a + e = a := by <proofstate>['G✝ : Type u\ninst✝¹ : Group G✝\na✝ b✝ : G✝\nG : Type u\ninst✝ : Group G\na b c : G\n⊢ a + e = a']</proofstate>
-  apply cancel_left (a := -a) <proofstate>['G✝ : Type u\ninst✝¹ : Group G✝\na✝ b✝ : G✝\nG : Type u\ninst✝ : Group G\na b c : G\n⊢ -a + (a + e) = -a + a']</proofstate>
+example : a + e = a := by
+  apply cancel_left (a := -a)
   simp[←assoc,id_left,inv_left]
 ```
 
@@ -242,8 +242,8 @@ Proving inv_right
 
 We can also show `inv_right` is derivable. 
 ```lean
-theorem Group.inv_right : a + (-a) = e := by <proofstate>['G : Type u\ninst✝ : Group G\na : G\n⊢ a + -a = e']</proofstate>
-  apply cancel_left (a := -a) <proofstate>['G : Type u\ninst✝ : Group G\na : G\n⊢ -a + (a + -a) = -a + e']</proofstate>
+theorem Group.inv_right : a + (-a) = e := by
+  apply cancel_left (a := -a)
   calc  -a + (a + (-a))
   _   = (-a + a) + (-a) := by rw[assoc]
   _   = e + (-a)        := by rw[inv_left]
@@ -492,14 +492,14 @@ Example Identity
 ===
 
 ```lean
-theorem mul_zero : x * e = e := by <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\n⊢ x * e = e']</proofstate>
-  have h0 := l_distrib (x := x) (y := e) (z := e) <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\n⊢ x * e = e']</proofstate>
-  have h := Ring.add_left h0 (-(x*e)) <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : -(x * e) + x * (e + e) = -(x * e) + (x * e + x * e)\n⊢ x * e = e']</proofstate>
-  rw[id_left]  at h <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : -(x * e) + x * e = -(x * e) + (x * e + x * e)\n⊢ x * e = e']</proofstate>
-  rw[inv_left] at h <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : e = -(x * e) + (x * e + x * e)\n⊢ x * e = e']</proofstate>
-  rw[←assoc]   at h <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : e = -(x * e) + x * e + x * e\n⊢ x * e = e']</proofstate>
-  rw[inv_left] at h <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : e = e + x * e\n⊢ x * e = e']</proofstate>
-  rw[id_left]  at h <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : x * (e + e) = x * e + x * e\nh : e = x * e\n⊢ x * e = e']</proofstate>
+theorem mul_zero : x * e = e := by
+  have h0 := l_distrib (x := x) (y := e) (z := e)
+  have h := Ring.add_left h0 (-(x*e))
+  rw[id_left]  at h
+  rw[inv_left] at h
+  rw[←assoc]   at h
+  rw[inv_left] at h
+  rw[id_left]  at h
   exact h.symm
 ```
  The `rw` part can be replaced with `simp only [id_left,inv_left,←assoc] at h`
@@ -508,18 +508,18 @@ Others Examples
 ===
 
 ```lean
-theorem neg_one : (-one:R)*x = -x := by <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\n⊢ -one * x = -x']</proofstate>
- <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\n⊢ -one * x = -x']</proofstate>
+theorem neg_one : (-one:R)*x = -x := by
+
   have h0 : (one:R) + -(one:R) = (e:R) := by rw[inv_right]
- <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\n⊢ -one * x = -x']</proofstate>
+
   have h1 : e = (e:R) * x := by rw[mulcomm,mul_zero]
- <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = e * x\n⊢ -one * x = -x']</proofstate>
-  nth_rewrite 2 [←h0] at h1 <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = (one + -one) * x\n⊢ -one * x = -x']</proofstate>
-  rw[r_distrib,mul_id_left] at h1 <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = x + -one * x\n⊢ -one * x = -x']</proofstate>
- <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = x + -one * x\n⊢ -one * x = -x']</proofstate>
-  have h2 := add_left h1 (-x) <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = x + -one * x\nh2 : -x + e = -x + (x + -one * x)\n⊢ -one * x = -x']</proofstate>
-  rw[←assoc,id_right,inv_left,id_left] at h2 <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = x + -one * x\nh2 : -x = -one * x\n⊢ -one * x = -x']</proofstate>
- <proofstate>['R : Type u\ninst✝ : CommRing R\nx : R\nh0 : one + -one = e\nh1 : e = x + -one * x\nh2 : -x = -one * x\n⊢ -one * x = -x']</proofstate>
+
+  nth_rewrite 2 [←h0] at h1
+  rw[r_distrib,mul_id_left] at h1
+
+  have h2 := add_left h1 (-x)
+  rw[←assoc,id_right,inv_left,id_left] at h2
+
   exact h2.symm
 ```
 
@@ -733,8 +733,8 @@ We only required `one * x = x` in our definition because we can prove the symmet
 
 
 ```lean
-theorem mul_id_right : x * one = x := by <proofstate>['F : Type u\ninst✝ : Field F\nx : F\n⊢ x * one = x']</proofstate>
-  rw[mulcomm] <proofstate>['F : Type u\ninst✝ : Field F\nx : F\n⊢ one * x = x']</proofstate>
+theorem mul_id_right : x * one = x := by
+  rw[mulcomm]
   rw[mul_id_left]
 ```
 
@@ -742,23 +742,23 @@ A Proof that 1 ≠ 0
 ===
 
 ```lean
-theorem one_ne_e : (one:F) ≠ e := by <proofstate>['F : Type u\ninst✝ : Field F\n⊢ one ≠ e']</proofstate>
- <proofstate>['F : Type u\ninst✝ : Field F\n⊢ one ≠ e']</proofstate>
-  intro h <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\n⊢ False']</proofstate>
-  obtain ⟨ x, y, hxy ⟩ := (inferInstance : Nontrivial F).exists_pair_ne <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\n⊢ False']</proofstate>
- <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\n⊢ False']</proofstate>
-  have hx : x = e := by <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\n⊢ x = e']</proofstate>
-    calc <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\n⊢ x = e']</proofstate>
+theorem one_ne_e : (one:F) ≠ e := by
+
+  intro h
+  obtain ⟨ x, y, hxy ⟩ := (inferInstance : Nontrivial F).exists_pair_ne
+
+  have hx : x = e := by
+    calc
       x = x * one := by rw[mul_id_right]
       _ = x * e   := by rw[h]
       _ = e       := by rw [mul_zero]
- <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\nhx : x = e\n⊢ False']</proofstate>
-  have hy : y = e := by <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\nhx : x = e\n⊢ y = e']</proofstate>
-    calc <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\nhx : x = e\n⊢ y = e']</proofstate>
+
+  have hy : y = e := by
+    calc
       y = y * one := by rw[mul_id_right]
       _ = y * e   := by rw[h]
       _ = e       := by rw[mul_zero]
- <proofstate>['F : Type u\ninst✝ : Field F\nh : one = e\nx y : F\nhxy : x ≠ y\nhx : x = e\nhy : y = e\n⊢ False']</proofstate>
+
   exact hxy (hx.trans hy.symm)
 ```
 
@@ -767,8 +767,8 @@ Spin is a a Nonempty Commutative Ring
 
 ```lean
 instance Spin.inst_nt : Nontrivial Spin := {
-  exists_pair_ne := by <proofstate>['G✝ : Type u\ninst✝³ : Group G✝\na✝ b✝ : G✝\nG : Type u\ninst✝² : Group G\na b c : G\nR : Type u\ninst✝¹ : CommRing R\nx✝ y✝ z✝ : R\nF : Type u\ninst✝ : Field F\nx y z : F\n⊢ ∃ x y, x ≠ y']</proofstate>
-    use up, dn <proofstate>['case h\nG✝ : Type u\ninst✝³ : Group G✝\na✝ b✝ : G✝\nG : Type u\ninst✝² : Group G\na b c : G\nR : Type u\ninst✝¹ : CommRing R\nx✝ y✝ z✝ : R\nF : Type u\ninst✝ : Field F\nx y z : F\n⊢ up ≠ dn']</proofstate>
+  exists_pair_ne := by
+    use up, dn
     simp
 }
 

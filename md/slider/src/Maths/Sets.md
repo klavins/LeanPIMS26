@@ -170,8 +170,8 @@ Using the new definitions, we can write:
 def A : Set ℕ := (· > 4)
 def B : Set ℕ := (· > 5)
 
-example : 6 ∈ A ∩ B := by   -- This is just the statement A 6 ∧ B 6 <proofstate>['⊢ 6 ∈ A ∩ B']</proofstate>
-  apply And.intro <proofstate>['case left\n⊢ A 6', 'case right\n⊢ B 6']</proofstate>
+example : 6 ∈ A ∩ B := by   -- This is just the statement A 6 ∧ B 6
+  apply And.intro
   · simp[A]
   · simp[B]
 ```
@@ -188,15 +188,15 @@ infixl:40 " ⊆ " => Set.subset
 ```
  And proofs look like first order logic 
 ```lean
-example {α : Type} (A B : Set α) : A ∩ B ⊆ A := by <proofstate>['α : Type\nA B : Set α\n⊢ A ∩ B ⊆ A']</proofstate>
-  intro x hx <proofstate>['α : Type\nA B : Set α\nx : α\nhx : (A ∩ B) x\n⊢ A x']</proofstate>
+example {α : Type} (A B : Set α) : A ∩ B ⊆ A := by
+  intro x hx
   exact hx.left
 ```
  In fact, using the `change` tactic, you can make the goal look like FOL: 
 ```lean
-example {α : Type} (A B : Set α) : A ∩ B ⊆ A := by <proofstate>['α : Type\nA B : Set α\n⊢ A ∩ B ⊆ A']</proofstate>
-  change ∀ x, A x ∧ B x → A x <proofstate>['α : Type\nA B : Set α\n⊢ ∀ (x : α), A x ∧ B x → A x']</proofstate>
-  intro x hx <proofstate>['α : Type\nA B : Set α\nx : α\nhx : A x ∧ B x\n⊢ A x']</proofstate>
+example {α : Type} (A B : Set α) : A ∩ B ⊆ A := by
+  change ∀ x, A x ∧ B x → A x
+  intro x hx
   exact hx.left
 ```
 
@@ -210,15 +210,15 @@ This theorem uses the axiom `propext` which says `∀ {a b : Prop}, (a ↔ b) �
 
 ```lean
 theorem subset_antisymm_iff {α : Type} {A B : Set α}
-  : A = B ↔ A ⊆ B ∧ B ⊆ A := by <proofstate>['α : Type\nA B : Set α\n⊢ A = B ↔ A ⊆ B ∧ B ⊆ A']</proofstate>
-  apply Iff.intro <proofstate>['case mp\nα : Type\nA B : Set α\n⊢ A = B → A ⊆ B ∧ B ⊆ A', 'case mpr\nα : Type\nA B : Set α\n⊢ A ⊆ B ∧ B ⊆ A → A = B']</proofstate>
-  · intro h <proofstate>['case mp\nα : Type\nA B : Set α\nh : A = B\n⊢ A ⊆ B ∧ B ⊆ A']</proofstate>
-    simp only [h, and_self] <proofstate>['case mp\nα : Type\nA B : Set α\nh : A = B\n⊢ B ⊆ B']</proofstate>
-    intro x hx <proofstate>['case mp\nα : Type\nA B : Set α\nh : A = B\nx : α\nhx : B x\n⊢ B x']</proofstate>
+  : A = B ↔ A ⊆ B ∧ B ⊆ A := by
+  apply Iff.intro
+  · intro h
+    simp only [h, and_self]
+    intro x hx
     exact hx
-  · intro ⟨ ha, hb ⟩ <proofstate>['case mpr\nα : Type\nA B : Set α\nha : A ⊆ B\nhb : B ⊆ A\n⊢ A = B']</proofstate>
-    funext x <proofstate>['case mpr.h\nα : Type\nA B : Set α\nha : A ⊆ B\nhb : B ⊆ A\nx : α\n⊢ A x = B x']</proofstate>
-    apply propext <proofstate>['case mpr.h.a\nα : Type\nA B : Set α\nha : A ⊆ B\nhb : B ⊆ A\nx : α\n⊢ A x ↔ B x']</proofstate>
+  · intro ⟨ ha, hb ⟩
+    funext x
+    apply propext
     exact ⟨ ha x, hb x ⟩
 ```
  The name `antisym` comes from the observation that the subset relation is *antisymmetric*. 
@@ -227,12 +227,12 @@ An Example Set Equality
 ===
 
 ```lean
-example {α : Type} (A B : Set α) : A ∩ B = B ∩ A := by <proofstate>['α : Type\nA B : Set α\n⊢ A ∩ B = B ∩ A']</proofstate>
-  apply subset_antisymm_iff.mpr <proofstate>['α : Type\nA B : Set α\n⊢ A ∩ B ⊆ B ∩ A ∧ B ∩ A ⊆ A ∩ B']</proofstate>
-  apply And.intro <proofstate>['case left\nα : Type\nA B : Set α\n⊢ A ∩ B ⊆ B ∩ A', 'case right\nα : Type\nA B : Set α\n⊢ B ∩ A ⊆ A ∩ B']</proofstate>
-  · intro x hx <proofstate>['case left\nα : Type\nA B : Set α\nx : α\nhx : (A ∩ B) x\n⊢ (B ∩ A) x']</proofstate>
+example {α : Type} (A B : Set α) : A ∩ B = B ∩ A := by
+  apply subset_antisymm_iff.mpr
+  apply And.intro
+  · intro x hx
     exact ⟨ hx.right, hx.left ⟩
-  · intro x hx <proofstate>['case right\nα : Type\nA B : Set α\nx : α\nhx : (B ∩ A) x\n⊢ (A ∩ B) x']</proofstate>
+  · intro x hx
     exact ⟨ hx.right, hx.left ⟩
 ```
 
@@ -249,14 +249,14 @@ infixl: 55 " - " => Set.diff  -- Lean uses `\` but I couldn't get that to work
 ```
  For example, we can show the relationship between compliment and universe. 
 ```lean
-example {α : Type} {A : Set α} : Aᶜ = Set.univ - A := by <proofstate>['α : Type\nA : Set α\n⊢ A ᶜ = Set.univ - A']</proofstate>
-  apply subset_antisymm_iff.mpr <proofstate>['α : Type\nA : Set α\n⊢ A ᶜ ⊆ Set.univ - A ∧ Set.univ - A ⊆ A ᶜ']</proofstate>
-  constructor <proofstate>['case left\nα : Type\nA : Set α\n⊢ A ᶜ ⊆ Set.univ - A', 'case right\nα : Type\nA : Set α\n⊢ Set.univ - A ⊆ A ᶜ']</proofstate>
-  · intro x hx <proofstate>['case left\nα : Type\nA : Set α\nx : α\nhx : (A ᶜ ) x\n⊢ (Set.univ - A) x']</proofstate>
-    constructor <proofstate>['case left.left\nα : Type\nA : Set α\nx : α\nhx : (A ᶜ ) x\n⊢ Set.univ x', 'case left.right\nα : Type\nA : Set α\nx : α\nhx : (A ᶜ ) x\n⊢ (A ᶜ ) x']</proofstate>
+example {α : Type} {A : Set α} : Aᶜ = Set.univ - A := by
+  apply subset_antisymm_iff.mpr
+  constructor
+  · intro x hx
+    constructor
     · trivial
     · exact hx
-  · intro x ⟨ _, hc ⟩ <proofstate>['case right\nα : Type\nA : Set α\nx : α\nleft✝ : Set.univ x\nhc : (A ᶜ ) x\n⊢ (A ᶜ ) x']</proofstate>
+  · intro x ⟨ _, hc ⟩
     exact hc
 ```
 
@@ -270,10 +270,10 @@ def Set.power {α : Type} (S : Set α) : Set (Set α) := fun A => A ⊆ S
  Here is a nice example property: 
 ```lean
 example {α : Type} (A B : Set α)
-  : A ⊆ B → Set.power A ⊆ Set.power B := by <proofstate>['α : Type\nA B : Set α\n⊢ A ⊆ B → A.power ⊆ B.power']</proofstate>
-  intro hab S hS x Sx <proofstate>['α : Type\nA B : Set α\nhab : A ⊆ B\nS : Set α\nhS : A.power S\nx : α\nSx : S x\n⊢ B x']</proofstate>
-  apply hab <proofstate>['case a\nα : Type\nA B : Set α\nhab : A ⊆ B\nS : Set α\nhS : A.power S\nx : α\nSx : S x\n⊢ A x']</proofstate>
-  apply hS <proofstate>['case a.a\nα : Type\nA B : Set α\nhab : A ⊆ B\nS : Set α\nhS : A.power S\nx : α\nSx : S x\n⊢ S x']</proofstate>
+  : A ⊆ B → Set.power A ⊆ Set.power B := by
+  intro hab S hS x Sx
+  apply hab
+  apply hS
   exact Sx
 ```
  This operation and many more are defined in Mathlib's *extensive* `Set` Library:
