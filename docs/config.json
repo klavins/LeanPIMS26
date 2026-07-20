@@ -1,0 +1,50 @@
+{
+    "sections": [
+        { 
+            "name": "Introducton", 
+            "decks": [
+                { "path": "src/Introduction/Intro.md", "title": "Course Introduction" },
+                { "path": "src/Introduction/Lean.md", "title": "Lean" },
+                { "path": "src/Introduction/Programming.md", "title": "Programming" },
+                { "path": "src/Introduction/Datatypes.md", "title": "Datatypes" }
+            ]
+        }, 
+        { 
+            "name": "Type Theory", 
+            "decks": [
+                { "path": "src/TypeTheory/Overview.md", "title": "Foundations" },
+                { "path": "src/TypeTheory/Universes.md", "title": "Universes" },
+                { "path": "src/TypeTheory/Simple.md", "title": "Simple Types" },
+                { "path": "src/TypeTheory/NonSimpleTypes.md", "title": "Non Simple Types" },
+                { "path": "src/TypeTheory/Inference.md", "title": "Inference" }            
+            ]
+        },
+        { 
+            "name": "Logic", 
+            "decks": [
+                { "path": "src/Logic/Propositional.md", "title": "Propositional Logic" }, 
+                { "path": "src/Logic/Curry-Howard.md", "title": "Curry-Howard" },                    
+                { "path": "src/Logic/Connectives.md", "title": "Connectives" }, 
+                { "path": "src/Logic/FirstOrder.md", "title": "First Order Logic" },
+                { "path": "src/Logic/Tactics.md", "title": "Tactics" },                           
+                { "path": "src/Logic/Equality.md", "title": "Equality" }
+            ]
+        },
+        { 
+            "name": "Maths", 
+            "decks": [
+                { "path": "src/Maths/Algebra.md", "title": "Algebra" },
+                { "path": "src/Maths/Sets.md", "title": "Sets" },
+                { "path": "src/Maths/Relations.md", "title": "Relations" },
+                { "path": "src/Maths/Numbers.md", "title": "Numbers" }
+            ]
+        },  
+        {
+            "name": "Examples",
+            "decks": [
+                { "path": "src/Examples/FOL.md", "title": "First Order Logic" },
+                { "path": "src/Examples/TemporalLogic.md", "title": "Temporal Logic" }
+            ]
+        }
+    ]
+}

@@ -1,9 +1,20 @@
 # Automated Mathematics
 
-In the Winter of 2026 I taught a course covering type theory and proof assistants in Lean. 
-To make it easy on myself, I wrote all the course notes in Lean and used 
-a code to slides converter I wrote called slider, which looks for markdown and 
-a few different comment embedded tags to split the source into slides. The result
-is a set of easy to use and edit slides decks, which can be 
-viewed [here](https://faculty.washington.edu/klavins/LeanW26/dist/).
+These are the slides for the 2026 PIMS Workshop on Automated Mathematics. The can be viewed at 
+
+> [https://klavinslab.org/PIMS](https://klavinslab.org/PIMS)
+
+To compile the slides locally and test, do
+
+```bash
+cd md
+make
+make deploy
+cd ../docs
+ws
+```
+
+and then navigate to the URL that `ws` reports. 
+
+Note that `ws` is a local web server: https://github.com/lwsjs/local-web-server. 
 

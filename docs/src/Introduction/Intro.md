@@ -1,15 +1,4 @@
---  Copyright (C) 2025  Eric Klavins
---
---  This program is free software: you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation, either version 3 of the License, or
---  (at your option) any later version.
 
-import Mathlib
-
-namespace LeanW26
-
-/-
 Automated Mathematics
 ===
 
@@ -55,8 +44,7 @@ Proof Assistants and Math
 - He posed a challenge: Encode it in Lean.
 - A group of volunteers led by Johan Commelin produced a Lean version of the main theorem in six months.
 
-> I find it absolutely insane that interactive proof assistants are now at the level that, within a
-> very reasonable time span, they can formally verify difficult original research.
+> I find it absolutely insane that interactive proof assistants are now at the level that, within a very reasonable time span, they can formally verify difficult original research.
 >
 > — Peter Scholze
 
@@ -230,9 +218,8 @@ Lean
   Zulip Chat
   </a> — Discussion groups
 
--/
 
-/-
+
 Acknowledgements
 ===
 
@@ -241,9 +228,20 @@ Winter of 2025 at the University of Washington. We all learned Lean together. At
 I was a few weeks ahead, and by the end of the course I was a few weeks behind.
  Much of the material here was developed in response to their questions and ideas.
 
--/
 
-
+```lean
 --hide
 end LeanW26
 --unhide
+```
+
+License
+===
+
+Copyright (C) 2025  Eric Klavins
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.   
+
