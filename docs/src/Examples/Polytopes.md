@@ -54,7 +54,7 @@ where
 namespace VPolytope
 ```
 
-The namespace
+Namespace
 ===
 The `carrier` is going to produce the underlying set associated to the `VPolytope` structure. 
 ```lean
@@ -116,10 +116,10 @@ where
   offset : ℝ
 ```
 
-This a aligns with the mathematical definition of a halfspace depending only on a normal vector and an offset.
+This aligns with the mathematical definition of a halfspace depending only on a normal vector and an offset.
 
 
-The namespace
+Namespace
 ===
 Inside the Halfspace namespace we can define the carrier to be:
 
@@ -138,7 +138,7 @@ theorem isClosed (H : Halfspace E) : IsClosed H.carrier := by
   · exact continuous_const
 ```
 
-Inferring DecidableEq
+DecidableEq
 ===
 `DecidableEq` is a typeclass in Lean. To tell Lean that the `Halfspace` type has decidable equality, we need to instantiate this typeclass.
 
@@ -199,7 +199,7 @@ extends HPolyhedron E where
   (bounded : Bornology.IsBounded (toHPolyhedron.carrier))
 ```
 
-We are extending the `HPolyhedron` definition y adding the condiiton that it must be `bounded`.
+We are extending the `HPolyhedron` definition by adding the condiiton that it must be `bounded`.
 
 If defined like this, an `HPolytope` will inherit definitions and theorems defined for an `HPolyhedron`.
 
@@ -227,7 +227,7 @@ def dual (P : Set E) : Set E :=
 
 The dual of a VPolytope
 ===
-One can observe directly from the definition of duality the the dual of a VPolytope is an HPolyhedron (because points become halfspaces).
+One can guess directly from the definition of duality that the dual of a VPolytope is an HPolyhedron since points become halfspaces.
 
 Therefore, we can define the dual of a `VPolytope` as:
 
