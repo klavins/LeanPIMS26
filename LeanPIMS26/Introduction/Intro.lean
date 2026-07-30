@@ -57,6 +57,24 @@ AI Companies
 - [Math, Inc](https://www.math.inc/)
 ...
 
+Moral and Ethical Issues
+===
+
+- Leiden Declaration on Artificial Intelligence and Mathematics. [[link]](https://leidendeclaration.ai/)
+    - "Technologies that draw extensively on the published mathematical commons undermine the traditional system of attribution.""
+    - Access to models is expensive and therefore not uniform
+
+- Jun–Yong Park, Automation Without Understanding:
+Why the United States must preserve mathematical capacity in the age of AI. [[link]](https://arxiv.org/pdf/2607.06377)
+    - "Mathematical capacity is not a stockpile of theorems. It is a community of people transformed, by years of rigorous training, into minds able to see abstract structure inside complexity."
+
+- Jeremy Avigad, Is Mathematics Obsolete? [[link]](https://arxiv.org/abs/2502.14874)
+    - "AI offers us new means to discover and understand phenomena that would otherwise remain opaque to us, to think and reason better, and to make better decisions"
+
+- Jack Conte, Change. [[link]](https://www.youtube.com/watch?v=Ue9-zkAz59A)
+
+
+
 Proof Assistants
 ===
 
