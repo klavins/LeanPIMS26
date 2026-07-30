@@ -106,11 +106,7 @@ Thus, if we just pass one argument to `f4` we a get _partial application_,
 def f5 := f4 10
 ```
 
-The function `f5` in this case is equivalent to
-
-```lean
-def f5' (y: ℕ) := 20 + y
-```
+The function `f5` in this case is equivalent to `def f5' (y: ℕ) := 20 + y`.
 
 Testing these functions gives:
 
@@ -118,7 +114,6 @@ Testing these functions gives:
 #eval f4 10 1    -- 21
 #eval f4' 10 1   -- 21
 #eval f5 1       -- 21
-#eval f5' 1      -- 21
 ```
 
 Functions that Operate on Functions
@@ -178,7 +173,7 @@ Constructors
 ===
 
 Many types in Lean are defined *inductively* with *constructors*. For example, there are two
-ways to make a `ℕ`.
+ways to make a natural number.
 
 ```lean
 #print Nat -- constructors:
@@ -193,13 +188,13 @@ def nonzero (x : ℕ) : Bool :=
   | Nat.zero => false
   | Nat.succ k => true
 
-#eval nonzero 0
-#eval nonzero 1234
+#eval (nonzero 0, nonzero 1234)
 ```
- Of course this function could also have been written: 
-```lean
-def nonzero' (x : ℕ) := x ≠ 0
-```
+
+
+<div class="fn">Numbers like <tt>3</tt> are just shorthand for <tt>zero.succ.succ.succ</tt></div>
+
+
 
 Match is a General Pattern Matcher
 ===
@@ -237,17 +232,8 @@ def fct (n : ℕ) : ℕ :=
   match n with
   | 0 => 1
   | k+1 => n * (fct k)
-```
- And here's another example the extends the `do_twice` function: 
-```lean
-def do_n (n : ℕ) (f : ℕ → ℕ) (x : ℕ) :=
-  match n with
-  | 0 => x
-  | k+1 => f (do_n k f x)
 
-def f10 := do_n 10 f1
-
-#eval f10 0
+#eval fct 5    -- 120
 ```
 
 When Recursion Doesn't Work
@@ -365,7 +351,7 @@ theorem fct_fact : fact = fct := by
   unfold fact
   simp[helper n 1]
 ```
- We'll explain this in a couple of weeks. 
+ We'll explain this later. 
 
 Exercises
 ===

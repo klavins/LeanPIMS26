@@ -19,6 +19,7 @@ Each slide deck contains exercises interspersed with the slides, mostly done in 
 When we finish a slide deck, we will pause to let you work on the exercises.
 
 
+
 About Lean
 ===
 
