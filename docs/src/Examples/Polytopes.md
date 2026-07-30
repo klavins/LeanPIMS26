@@ -8,20 +8,25 @@ Overview
 
 One can represent polytopes in two ways:
 
-- As the convex hull of finitely many points. In this case, we refer to it as a *V-polytope*.
+- As the convex hull of finitely many points. In this case, we refer to it as a **V-polytope**.
 
-- As the bounded intersection of finitely many closed halfspaces. In this case, we refer to it as an *H-polytope*.
+- As the bounded intersection of finitely many closed halfspaces. In this case, we refer to it as an **H-polytope**.
 
-These two representations are equivalent due to the *Minkowski-Weyl Theorem*.
+These two representations are equivalent due to the **Minkowski-Weyl Theorem**.
+
+This is an unfinished formalization project for the Minkowski-Weyl Theorem.
+
+**Repository:** https://github.com/luzelenag123/EE598_Final_Project
 
 
 
 Set up
 ===
-For some of the definitions included here, we'll need for perform pointwise operations and use noncomputable constructions (e.g. choice). For this, we will use:
+We'll need to perform pointwise operations and use noncomputable constructions (e.g. axiom of choice). For this, we will use:
 
 ```lean
-open scoped Pointwise -- using `scoped` imports only the notation.
+-- using `scoped` below imports only the notation.
+open scoped Pointwise
 noncomputable section
 ```
 
@@ -29,11 +34,9 @@ We'll also need to define the space in which our polytopes will live:
 
 ```lean
 variable {E : Type*}
-[DecidableEq E] [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  [NormedAddCommGroup E][InnerProductSpace ℝ E]
+  [FiniteDimensional ℝ E][DecidableEq E]
 ```
-
-This creates a finite-dimensional vector space equipped with a real inner-product and with decidable equality.
-
 
 V-Polytopes
 ===
@@ -49,44 +52,56 @@ where
   points : Finset E
 ```
 
-Now we can add a few definitions directly associated to a V-polytope:
+ Next, we'll add a few definitions directly associated to a VPolytope. For this, we create a namespace.
 
 ```lean
 namespace VPolytope
 ```
-- Underlying set associated to the `VPolytope` structure. 
+
+Namespace
+===
+The `carrier` is going to produce the underlying set associated to the `VPolytope` structure. 
 ```lean
 def carrier (P : VPolytope E) : Set E :=
   convexHull ℝ (↑P.points : Set E)
 ```
-- VPolytope resulting from translating `P` by vector `v`. 
+The `translate` map is going to produce a new `VPolytope` resulting from translating `P` by the vector `v`. 
 ```lean
 def translate (P : VPolytope E) (v : E) : VPolytope E :=
   ⟨v +ᵥ P.points⟩
 ```
 
+The definitions and theorems written inside this namespace can be accessed from outside the namespace by writting `VPolytope.{definition\theorem}`.
 
-Proving isBounded, isConvex, isClosed
+
+isCompact, isConvex
 ===
+We can write simple theorems like the following inside this namespace.
 
 ```lean
 theorem isCompact (P : VPolytope E) : IsCompact P.carrier := by
   simpa [carrier] using
-      (Set.Finite.isCompact_convexHull
-        (s := (↑P.points : Set E))
-        (P.points.finite_toSet))
-
-theorem isClosed (P : VPolytope E) : IsClosed P.carrier := by
-  exact (isCompact P).isClosed
-
-theorem isBounded (P : VPolytope E) : Bornology.IsBounded P.carrier := by
-  exact (isCompact P).isBounded
+    (P.points.finite_toSet).isCompact_convexHull
+      (𝕜 := ℝ)
+      (s := (↑P.points : Set E))
 
 theorem isConvex (P : VPolytope E) : Convex ℝ P.carrier := by
   simpa [VPolytope.carrier] using
           (convex_convexHull ℝ (↑P.points : Set E))
 
 end VPolytope
+```
+
+Exercise
+===
+Search Mathlib's `Compact.lean` file for theorems that help prove `isClosed` and `isBounded` in just one line.
+
+```lean
+theorem isBounded (P : VPolytope E) : Bornology.IsBounded P.carrier := by
+  sorry
+
+theorem isClosed (P : VPolytope E) : IsClosed P.carrier := by
+  sorry
 ```
 
 
@@ -105,6 +120,11 @@ where
   offset : ℝ
 ```
 
+This aligns with the mathematical definition of a halfspace depending only on a normal vector and an offset.
+
+
+Namespace
+===
 Inside the Halfspace namespace we can define the carrier to be:
 
 ```lean
@@ -112,38 +132,50 @@ namespace Halfspace
 
 def carrier (h : Halfspace E) : Set (E) :=
   {x | inner ℝ h.normal x ≤ h.offset}
-
--- Exercise: Prove `isConvex` and `isClosed`. You might need to find/use some basic mathlib results.
+```
+ We can also prove that a Halfspace is `isClosed` as follows:
+```lean
 theorem isClosed (H : Halfspace E) : IsClosed H.carrier := by
-  sorry
-theorem isConvex (H : Halfspace E) : Convex ℝ H.carrier := by
-  sorry
+  dsimp [carrier]
+  apply isClosed_le
+  · exact Continuous.inner continuous_const continuous_id
+  · exact continuous_const
 ```
 
-Lean can infer how to decide equality between two halfspaces:
+DecidableEq
+===
+`DecidableEq` is a typeclass in Lean. To tell Lean that the `Halfspace` type has decidable equality, we need to instantiate this typeclass.
+
+Lean can sometimes infer the instance using the tactic `infer_instance`:
 
 ```lean
 instance [DecidableEq E] : DecidableEq (Halfspace E) := by
   classical
   infer_instance
 ```
- We need to instanciate this typeclass in order to be able to create sets of halfspaces.
+ We need `DecidableEq` in order to be able to create sets of halfspaces.
 ```lean
 end Halfspace
 ```
 
+Exercise
+===
+Use the help of AI to generate a proof for `isConvex`.
+```lean
+theorem isConvex (H : Halfspace E) : Convex ℝ H.carrier := by
+  sorry
+```
 
-H-Polytopes
+
+H-Polyhedra
 ===
 
-An *H-Polyhedron* is a finite intersection of halfspaces. An *H-Polytope* is an *H-Polyhedron* that is also bounded. In Lean, we can encode this as follows:
+An **H-Polyhedron** is a finite intersection of halfspaces. An **H-Polytope** is an H-Polyhedron that is also bounded. In Lean, we can encode this as follows:
 
 ```lean
 structure HPolyhedron (E : Type*)
-  [DecidableEq E]
-  [NormedAddCommGroup E]
-  [InnerProductSpace ℝ E]
-  [FiniteDimensional ℝ E]
+  [DecidableEq E][NormedAddCommGroup E]
+  [InnerProductSpace ℝ E][FiniteDimensional ℝ E]
 where
   (halfspaces : Finset (Halfspace E))
 
@@ -152,24 +184,46 @@ namespace HPolyhedron
 def carrier (P : HPolyhedron E) : Set E :=
   ⋂ h ∈ P.halfspaces, (h.carrier)
 
--- We can also include theorems like `isConvex` and `isClosed` inside this namespace.
-
--- Challenge: Define how to translate an HPolyhedron.
-def translate (P : HPolyhedron E) (v : E) : HPolyhedron E :=
-  sorry
-
 end HPolyhedron
+```
 
+H-Polytopes
+===
+Since an H-Polytope is an H-Polyhedron with additional conditions, we can use `extends` in Lean.
+
+```lean
 structure HPolytope (E : Type*)
-  [DecidableEq E]
-  [NormedAddCommGroup E]
-  [InnerProductSpace ℝ E]
-  [FiniteDimensional ℝ E]
+  [DecidableEq E][NormedAddCommGroup E]
+  [InnerProductSpace ℝ E][FiniteDimensional ℝ E]
 extends HPolyhedron E where
   (bounded : Bornology.IsBounded (toHPolyhedron.carrier))
 ```
 
-An `HPolytope` will inherit definitions and theorems defined for an `HPolyhedron`.
+We are extending the `HPolyhedron` definition by adding the condiiton that it must be `bounded`.
+
+If defined like this, an `HPolytope` will inherit definitions and theorems defined for an `HPolyhedron`.
+
+
+Exercise
+===
+
+```lean
+abbrev ℝn (n : ℕ) := EuclideanSpace ℝ (Fin n)
+```
+
+Define `P` as the `VPolytope` generated by (0,0), (0,1), and (1,0). Define `Q` as the `HPolyhedron` generated by the equations x ≥ 0, y ≥ 0, and x + y ≤ 1.
+
+```lean
+def P : VPolytope (ℝn 2) := sorry
+def Q : VPolytope (ℝn 2) := sorry
+```
+
+**Extra Challenge:** Define how to translate an `HPolyhedron` inside its namespace.
+
+```lean
+def translate (P : HPolyhedron E) (v : E) : HPolyhedron E :=
+  sorry
+```
 
 
 Duality
@@ -183,24 +237,14 @@ def dual (P : Set E) : Set E :=
   ⋂ x ∈ (P \ {0}), (Halfspace.mk x 1).carrier
 ```
 
-Exercise: With this definition we can now prove some basic properties of duality.
+One can observe that duality sends points to halfspaces.
 
-```lean
-namespace dual
 
-theorem isClosed (P : Set E) : IsClosed (dual P) := by
-  sorry
-theorem isConvex (P : Set E) : Convex ℝ (dual P) := by
-  sorry
-theorem zero_mem (P : Set E) : (0 : E) ∈ dual P := by
-  sorry
-theorem isAntitone {A B : Set E} (h : A ⊆ B) : dual B ⊆ dual A := by
-  sorry
+The dual of a VPolytope
+===
+One can guess directly from the definition of duality that the dual of a VPolytope is an HPolyhedron since points become halfspaces.
 
-end dual
-```
-
-We can also define what the `HPolytope` that is dual to a `VPolytope` should be:
+Therefore, we can define the dual of a `VPolytope` as:
 
 ```lean
 def VPolytope.dual (P : VPolytope E) : HPolyhedron E :=
@@ -213,10 +257,29 @@ A natural theorem would then be:
 theorem dual_of_VPolytope (P : VPolytope E) : dual P.carrier = P.dual.carrier := sorry
 ```
 
-This is a long Lean proof, so we are not doing it today.
+This is a long Lean proof, so we are not doing it today. If you want, you can try to generate a proof using AI.
 
 
-Main Theorems
+Exercise
+===
+Prove the following basic properties of duality.
+
+```lean
+namespace dual
+
+theorem zero_mem (P : Set E) : (0 : E) ∈ dual P := by
+  sorry
+
+theorem isAntitone {A B : Set E} (h : A ⊆ B) : dual B ⊆ dual A := by
+  sorry
+
+end dual
+```
+
+It is also true that the dual of a set of is closed and convex, and should follow directly from the Halfspace properties.
+
+
+Main theorems
 ===
 Some of the main theorems we want to prove in order to establish the equivalence between VPolytopes and HPolytope include:
 
@@ -224,25 +287,34 @@ Some of the main theorems we want to prove in order to establish the equivalence
 theorem separation_compact_closed
     {C D : Set E}
     (hC_nonempty : C.Nonempty)
-    (hC_convex : Convex ℝ C)
-    (hC_compact : IsCompact C)
+    (hC_convex : Convex ℝ C) (hC_compact : IsCompact C)
     (hD_nonempty : D.Nonempty)
-    (hD_convex : Convex ℝ D)
-    (hD_closed : IsClosed D)
+    (hD_convex : Convex ℝ D) (hD_closed : IsClosed D)
     (hdisj : Disjoint C D) :
     ∃ (a : E) (b : ℝ),
       a ≠ 0 ∧
       C ⊆ {x | inner ℝ a x < b} ∧
       D ⊆ {x | inner ℝ a x > b} := sorry
+```
 
+More main theorems
+===
+
+```lean
 theorem dual_of_dual
   (X : Set E) :
   dual (dual X)
-    = closure (convexHull ℝ (Set.union X ({0} : Set E))) := sorry
+  = closure
+    (convexHull ℝ
+    (Set.union X ({0} : Set E))) := sorry
 
-theorem HPolytope_is_VPolytope : ∀ P : HPolytope E, ∃ Q : VPolytope E, P.carrier = Q.carrier := sorry
+theorem HPolytope_is_VPolytope :
+  ∀ P : HPolytope E,
+  ∃ Q : VPolytope E, P.carrier = Q.carrier := sorry
 
-theorem VPolytope_is_HPolytope [Nontrivial E] : ∀ P : VPolytope E, ∃ Q : HPolytope E, P.carrier = Q.carrier := sorry
+theorem VPolytope_is_HPolytope [Nontrivial E] :
+  ∀ P : VPolytope E,
+  ∃ Q : HPolytope E, P.carrier = Q.carrier := sorry
 
 --hide
 end
