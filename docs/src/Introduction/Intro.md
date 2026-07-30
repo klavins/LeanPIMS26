@@ -63,7 +63,6 @@ Why the United States must preserve mathematical capacity in the age of AI. [[li
 - Jack Conte, Change. [[link]](https://www.youtube.com/watch?v=Ue9-zkAz59A)
 
 
-
 Proof Assistants
 ===
 
