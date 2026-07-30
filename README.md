@@ -2,7 +2,7 @@
 
 These are the slides for the 2026 PIMS Workshop on Automated Mathematics. The can be viewed at 
 
-> [https://klavinslab.org/PIMS](https://klavinslab.org/PIMS)
+> [https://klavinslab.org/LeanPIMS26/](https://klavinslab.org/LeanPIMS26/)
 
 To compile the slides locally and test, do
 

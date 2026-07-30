@@ -15,56 +15,76 @@ Automated Mathematics
 Luz Elena Grisales Gómez and Nat Hurtig (TAs)
 A Pacific Institute for the Mathematical Sciences <a href="https://www.pims.math.ca/events/260817-pwoamla">Workshop</a>, held August 17-19 at the University of British Columbia.
 
-What is this Course About?
+What is Happening?
 ===
 
-The representation and manipulation of mathematical knowledge symbolically
-  - Foundations of Mathematics
-  - Automated reasoning
-  - The L∃∀N proof assistant
+- **The Jacobian conjecture is false** (July 2026)
+    - Claude Fable 5 + Lean
 
-Specific Topics
-  - Type theory
-  - The Curry-Howard Isomorphism
-  - Representation of mathematical objects
-  - Meta-level programming about mathematics
-  - Applications
+- **The Erdős unit distance conjecture is false** (May 2026)
+    - OpenAI general-purpose reasoning model + mathematicians
+    - (post-hoc) Aleph Prover/Lean formalization
 
-Why Now?
+- **The First Proof challenge** (early 2026)
+    - Open problems (to avoid GPT looking up obscure papers)
+    - Aletheia / Gemini 3 Deep Think architecture (no Lean)
+    - Ensemble of Gemini models
+
+<div class='fn'>
+<a href="https://x.com/alpoge/status/2079028340955197566">L. Alpöge</a>.
+<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/">Erdös Unit</a>.
+<a href="https://deepmind.google/blog/accelerating-mathematical-and-scientific-discovery-with-gemini-deep-think/">Deep Think</a>.
+</class>
+
+Math and AI
 ===
 
-- The theory underlying proof assistants is mature and active
-    - Basis: Calculus of Inductive Constructions (CIC)
-    - Advanced: [HOTT](https://homotopytypetheory.org/)
-- The software and tooling has improved considerably
+**LLMs + Proof Assistants**
+  - _Generation_ by an LLM
+  - _Verification_ by Lean, Experts, or Another LLM
+
+<img src='img/brain.jpg' class='img-up-right' width=40%></img>
+
+**AI as a learning tool***
+- The combination of LLMs and Lean, even without<br/>integration, could make
+advanced mathematics<br/> more accessible than ever.
+- Use wisely : [AI in Papers](https://ai-math.zulipchat.com/#narrow/channel/539992-Web-public-channel---AI-Math/topic/Best.20practices.20for.20incorporating.20AI.20etc.2E.20in.20papers/near/546518354), [AI Generated Papers](https://categorytheory.zulipchat.com/#narrow/channel/229111-community.3A-general/topic/AI-generated.20papers/near/546399334)
+
+AI Companies
+- [DeepMind / AlphaProof](https://deepmind.google/blog/ai-solves-imo-problems-at-silver-medal-level/)
+- [Aristotle] (https://aristotle.harmonic.fun/)
+- [Axiom](https://axiommath.ai/)
+- [Math, Inc](https://www.math.inc/)
+...
+
+Proof Assistants
+===
+
+- LLMs are better than most programmers at coding
+
+- The Curry-Howard Isomorphism: math *is* coding
+
+- Type Theory is the _lingua franca_ of formal math
+    - The software and tooling has improved considerably
     - Implementation tradeoffs in CIC optimized
     - Improved modularity
-    - IDE support
     - Multiple options: L∃∀N, Rocq, Agda, ...
-- Major projects like [Mathlib](https://github.com/leanprover-community/mathlib4), [SciLean](https://github.com/lecopivo/SciLean), [FLT](https://lean-lang.org/use-cases/flt/), [LTE](https://leanprover-community.github.io/blog/posts/lte-final/), ...
-    - Adoption by well known mathematicians like [Terrence Tao](https://github.com/teorth/analysis)
-    - Potentially a major change in publishing
-- LLMs
-    - make advanced programming tractable for mortals
-    - can auto-formalize mathematical text into L∃∀N
+
+- Major projects
+    - [Mathlib](https://github.com/leanprover-community/mathlib4), [CSLib](https://www.cslib.io/), [SciLean](https://github.com/lecopivo/SciLean)
+    - [LeanPool](https://github.com/Vilin97/lean-pool)
+    - [The Liquid Tensor Experiment](https://leanprover-community.github.io/blog/posts/lte-final/)
+    - [Tao's Analysis](https://github.com/teorth/analysis)
+
+<div class="fn">I find it absolutely insane that interactive proof assistants are now at the level
+that, within a very reasonable time span, they can formally verify difficult original research.
+— Peter Scholze</fn>
 
 
-Proof Assistants and Math
-===
 
-[The Liquid Tensor Experiment](https://leanprover-community.github.io/blog/posts/lte-final/)
-- Peter Scholze worried there could be some subtle gap in his result on Condensed Sets with Dustin Clausen.
-- He posed a challenge: Encode it in Lean.
-- A group of volunteers led by Johan Commelin produced a Lean version of the main theorem in six months.
 
-> I find it absolutely insane that interactive proof assistants are now at the level that, within a
-> very reasonable time span, they can formally verify difficult original research.
->
-> — Peter Scholze
 
-<div class='fn'>Nature 595, 18-19 (2021), doi: https://doi.org/10.1038/d41586-021-01627-2</div>
-
-Formalized Mathematics
+Mathlib
 ===
 
 The Mathlib project and others have formalized even more.
@@ -82,7 +102,7 @@ Condensed               Init.lean               Probability             Util
 Control                 Lean                    RepresentationTheory
 
 > find Mathlib -name '*.lean' -print0 | xargs -0 wc -l | tail -1
-  615506 total
+  953293 total
 </pre>
 </small></div>
 
@@ -93,85 +113,42 @@ https://github.com/leanprover-community/mathlib4<br>
 https://strathmaths.wordpress.com/2013/04/17/how-much-mathematics-is-there
 </div>
 
+<div class="fn">Was 615506 in Jan 2026 when I last checked</div>
 
-
-Math and AI
+Course Goals
 ===
 
-LLMs
-- Great at generating text, images, and designs.
-- Not grounded in reality or logic.
+- Understand Type Theory as a foundation of mathematics
+- Represent and reason about mathematics formally using Lean
+- Use LLMs in combination with Lean to vibe-prove
+- Implement a basic autoformalization loop
+- Be prepared to teach an Automated Mathematics course
 
-<img src='img/brain.jpg' class='img-up-right' width=40%></img>
-
-Integration
-- However if you put Lean and an LLM into a feedback<br>
-loop, you get a sort of left-brain / right-brain system, <br>
-which is increasingly powerful.
-
-As a learning tool
-- The combination of LLMs and Lean, even without integration, will make
-advanced mathematics more accessible than ever.
-- Use wisely : [AI in Papers](https://ai-math.zulipchat.com/#narrow/channel/539992-Web-public-channel---AI-Math/topic/Best.20practices.20for.20incorporating.20AI.20etc.2E.20in.20papers/near/546518354), [AI Generated Papers](https://categorytheory.zulipchat.com/#narrow/channel/229111-community.3A-general/topic/AI-generated.20papers/near/546399334)
-
-AI Companies
-- [DeepMind / AlphaProof](https://deepmind.google/blog/ai-solves-imo-problems-at-silver-medal-level/),
-[Aristotle] (https://aristotle.harmonic.fun/),
-[Axiom](https://axiommath.ai/),
-[Math, Inc](https://www.math.inc/),
-[DeepSeek Prover](https://prover-v2.com/),
-...
-
-
-
-
-
-
-Use of AI
+Detailed Topics
 ===
 
-Current State
-- GPT, Gemini, DeepSeek etc. are good at generating / fixing Lean code. Aristotle is quite good.
-- Most of the exercises in this course can be solved by an AI with some back and forth.
+The representation and manipulation of mathematical knowledge symbolically
+  - Foundations of Mathematics
+  - Automated reasoning
+  - The L∃∀N proof assistant
+  - Vibe Proving
 
-Limitations
-- Formalizing a new area of mathematics is harder because it involves
-*defining* the framework,not just proving theorems.
-- The choice of representation affects the difficulty of proof.
+Specific Topics
+  - Type theory
+  - The Curry-Howard Isomorphism
+  - Basic Math : Logic, Sets, Algebra, Topology
+  - Mathlib
+  - Autoformalization
 
-Learning something
-- Just because an AI answered your question, doesn't mean you understand the answer
-- If you want to build new tools, including new AIs, based on Lean (or similar tools),
-you need to know those tools.
 
-Course Details
-===
 
-Topics
-- Type theory
-- Logic, numbers, sets, relations, ...
-- Various mathematical topics
-- Domain specific languages
-- Meta-programming
-- Interfacing L∃∀N to other languages
 
-Homework: 60%
-- Each slide deck has exercises interspersed and at the end
-- Exercises are due as a standalone Lean file in canvas 1 week after the deck is completed in class
 
-Project: 40%
-- Lean centered project that builds on the ideas in this course
-   - Formalization, language design, applications, tools, ...
-- Rubric TBA
+
 
 Classroom Etiquette
 ===
 
-We have undergraduate and graduate students from four different departments!
-
-Some students are new to this area, others have been actively working in it.
-
-Please
 - Respect each other
 - Ask questions
 - Make space for others
@@ -185,12 +162,8 @@ What you are seeing is compiled from Lean code using my own custom slide
 environment called `Slider`. This tool is not ready for production, so it may
 not work on every browser, etc. I use Chrome.
 
-Slides are under construction
-- Some topics I am converting from last year's format
-- Some I have written all the code for, but not made into slides
-
 The slides are on the web at:
-- [https://klavinslab.org/PIMS](https://klavinslab.org/PIMS)
+- [https://klavinslab.org/LeanPIMS26/](https://klavinslab.org/LeanPIMS26/)
 
 The source code to the slides are at:
 - [https://github.com/klavins/LeanPIMS26](https://github.com/klavins/LeanPIMS26)
@@ -199,18 +172,6 @@ The source code to the slides are at:
 
 Resources
 ===
-
-Course Materials
-- Canvas
-
-Supplementary Texts
-- Morten Heine Sørensen, Pawel Urzyczyn.
-**Lectures on the Curry-Howard Isomorphism**.
-Elsevier. 1st Edition, Volume 149 - July 4, 2006.
-- **Homotopy Type Theory: Univalent Foundations of Mathematics**.
-The Univalent Foundations Program Institute for Advanced Study.
-[https://homotopytypetheory.org/book/](https://homotopytypetheory.org/book/).
-- Steve Awodey, **Category Theory**, Oxford University Press. 2nd Edition. 2010.
 
 Lean
 - <a href="https://lean-lang.org/theorem_proving_in_lean4/" target="other">
@@ -232,16 +193,28 @@ Lean
   Zulip Chat
   </a> — Discussion groups
 
+Supplementary Texts
+- Morten Heine Sørensen, Pawel Urzyczyn.
+**Lectures on the Curry-Howard Isomorphism**.
+Elsevier. 1st Edition, Volume 149 - July 4, 2006.
+- **Homotopy Type Theory: Univalent Foundations of Mathematics**.
+The Univalent Foundations Program Institute for Advanced Study.
+[https://homotopytypetheory.org/book/](https://homotopytypetheory.org/book/).
+
 -/
 
 /-
 Acknowledgements
 ===
 
-I would like to acknowledge the students who took my special topics course offered the
-Winter of 2025 at the University of Washington. We all learned Lean together. At first,
-I was a few weeks ahead, and by the end of the course I was a few weeks behind.
- Much of the material here was developed in response to their questions and ideas.
+I would like to acknowledge the students who took my special topics course offered the in the
+Winter of 2025 and again in the Winter of 2027  at the University of Washington.
+We all learned Lean together.
+Much of the material here was developed in response to their questions and ideas.
+At first,
+Each time I teach this course I start out a few weeks ahead,
+and by the end of the course I am a few weeks behind.
+
 
 -/
 
