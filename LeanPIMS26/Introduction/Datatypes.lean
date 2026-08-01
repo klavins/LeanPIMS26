@@ -9,9 +9,9 @@ import Mathlib
 import Lean
 
 /-
-Datatypes
+A Pragmatic Introduction to Types
 ===
-
+Curry-Howard Isomorphism: <u>propositions are types!</u>
 
 Inductively Defined Types
 ===

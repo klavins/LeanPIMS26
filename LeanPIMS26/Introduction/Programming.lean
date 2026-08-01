@@ -11,6 +11,8 @@ namespace LeanW26
 
 /-
 Programming in Lean
+===
+Curry-Howard Isomorphism: <u>proofs are programs!</u>
 
 Lean
 ===

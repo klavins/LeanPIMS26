@@ -12,6 +12,8 @@ namespace LeanW26.Universes
 /-
 Universes
 ===
+This code is probably misusing universe levels, since they are usually small natural numbers. If you are confident this is not the case, you can increase the limit ...
+Lean4 error message when you try to use a large unverse level
 
 Russell's Paradox
 ===

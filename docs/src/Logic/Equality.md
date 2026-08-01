@@ -877,7 +877,168 @@ structure K2 where
  Define the natural equivalence  
 ```lean
 def K_equiv : K1 ≃ K2 := sorry
+```
 
+Breaking Lean
+===
+
+"Definitional proof irrelevance, propositional extensionality, and impredicative
+`Prop` together make Lean's theory _not_ strongly normalizing
+
+<div class='fn'>Andreas Abel ; Thierry Coquand, <a href="https://lmcs.episciences.org/6606">https://lmcs.episciences.org/6606</a></div>
+
+
+```lean
+--hide
+set_option linter.defProp false
+--unhide
+```
+ In the simply typed lambda calculus, you cannot write `λ x => x x`. 
+```lean
+#check_failure (fun x => x x)                    -- δ is not definable
+#check_failure (fun x => x x) (fun x => x x)     -- neither is Ω
+```
+
+
+However,
+we can write a version of this using Lean's `Prop`.
+
+To proceed, we want to build a type for Ω. It should be something like this:
+
+```lean
+def T : Type u := ∀ (X : Type u), X → X
+```
+
+But this is a universe error: `∀ X : Type u, X → X` lives in `Type (u+1)`,
+one level above the `X` it quantifies over.
+
+Building δ
+===
+
+A quantification over all propositions is itself a proposition.
+
+
+```lean
+def T : Prop := ∀ (p : Prop), p → p
+```
+ Now we define `δ`, which plays the role of `λ x => x x`. 
+```lean
+def δ : T → T := fun (z : T) => (z (T → T) id) z
+```
+ Then define `δ'` as `δ` in disguise.
+
+```lean
+def δ' : T := fun p a =>
+  cast (propext (iff_of_true id a) : (T → T) = p) δ
+```
+
+
+Since `T → T` and `p` are both true (witnessed by `id` and `a`), `propext`
+makes them *equal*, and `cast` re-types `δ` as a proof of `p`.
+
+
+Defining Ω
+===
+
+Now we define Ω.
+```lean
+def Ω : T := δ δ'
+```
+
+Why does `Ω` loop?
+
+Unfolding `δ` instantiates `δ'` at `T → T`
+
+The equality becomes `(T → T) = (T → T)`.
+
+By proof irrelevance its proof is definitionally `rfl`,
+so the `cast` reduces away and `δ δ'` reappears so each
+unfolding of `Ω` reproduces `Ω`.
+
+```
+#reduce (proofs := true) Ω  -- maximum recursion depth has been reached
+```
+
+Our next goal is to show that `Ω` can make `rfl` loop.
+
+
+
+Accessibility
+===
+
+Accessibility is defined inductively and is used in the definition of a well-founded relation.
+
+```lean
+inductive Acc {α : Sort u} (r : α → α → Prop) : α → Prop where
+  | intro (x : α) (h : (y : α) → r y x → Acc r y) : Acc r x
+```
+
+In particular, consider the relation on ℕ containing no pairs.
+
+
+```lean
+def r : Nat → Nat → Prop := fun _ _ => False
+```
+
+
+Trivially, every number is accessible via this relation.
+Using `Acc` we define two proofs of `Acc r 0`. The first is trivial:
+
+
+```lean
+def acc0 : Acc r 0 := Acc.intro 0 (fun _ h => False.elim h)
+```
+
+Acc is special because it's the unique standard proposition that is both allowed to
+compute data and forced to be inspected to do it — the one legitimate breach
+in proof irrelevance's wall, kept open because termination proofs must run,
+and the demo lives entirely inside that breach.
+
+
+Looping rfl
+===
+
+Here is another proof that `0` is accessible, using `Ω` 
+```lean
+def accLoop : Acc r 0 := Ω (Acc r 0) acc0
+```
+ Since both are proofs of `Acc r 0`, by proof irrelevance they are the same.  
+```lean
+example : accLoop = acc0 := rfl
+```
+ Now define `F` to be the natural number we get by matching accLoop,
+ignoring arguments, and returning 0. 
+```lean
+noncomputable def F : Nat :=
+  match accLoop with
+  | Acc.intro _ _ => 0
+```
+ Then attempting to show that `F = 0` will loop forever (or until Lean gives up).
+
+```lean
+example : F = 0 := rfl -- maximum recursion depth has been reached
+```
+
+Exercises
+===
+
+<ex /> Prove the following using `rfl` and explain why neither proof crashes the type checker.
+
+```lean
+example : Ω = δ' := sorry
+example : Ω = fun p a => a := sorry
+```
+
+<ex/> Change `def accLoop` to `theorem accLoop`. Predict what happens to
+`example : F = 0 := rfl`. Explain the behavior you observe.
+
+<ex /> `δ'` can disguise `δ` as a proof of any true proposition. Try to use
+the same trick to prove `False` — for instance, what goes wrong with
+`Ω False ?_`? Explain why this construction breaks normalization but
+not consistency.
+
+
+```lean
 --hide
 end Natural
 end LeanW26

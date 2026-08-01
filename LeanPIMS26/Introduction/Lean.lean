@@ -10,6 +10,8 @@ import Mathlib
 /-
 A Tour of L∃∀N
 ===
+You have written my favorite computer game.
+Kevin Buzzard to Leo DeMoura [<a href="https://leodemoura.github.io/static/floc26/">floc26</a>].
 
 Routine
 ===

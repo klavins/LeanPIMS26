@@ -1,6 +1,8 @@
 
 Foundations of Mathematics
 ===
+If you’re adamant that x ∈ π should make sense then I say you’ve been brainwashed by set theory.
+Buzzard, <a href="https://xenaproject.wordpress.com/2020/06/20/mathematics-in-type-theory/">xenaproject</a>.
 
 Overview
 ===
