@@ -1,13 +1,4 @@
 
-Autoformalization
-===
-In mathematics the art of proposing a question must be held of higher value than solving it.
-George Cantor
-
-```lean
-end LeanW26
-```
-
 License
 ===
 

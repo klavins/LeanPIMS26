@@ -28,9 +28,7 @@
                 { "path": "src/Logic/Connectives.md", "title": "Connectives" }, 
                 { "path": "src/Logic/FirstOrder.md", "title": "First Order Logic" },
                 { "path": "src/Logic/Tactics.md", "title": "Tactics" },                           
-                { "path": "src/Logic/Equality.md", "title": "Equality" },
-                { "path": "src/Maths/Autoformalization.md", "title": "Autoformalization"},
-                { "path": "src/Introduction/VibeProving.md", "title": "Vibe Proving" }
+                { "path": "src/Logic/Equality.md", "title": "Equality" }
             ]
         },
         { 
@@ -39,7 +37,8 @@
                 { "path": "src/Maths/Algebra.md", "title": "Algebra" },
                 { "path": "src/Maths/Sets.md", "title": "Sets" },
                 { "path": "src/Maths/Relations.md", "title": "Relations" },
-                { "path": "src/Maths/Numbers.md", "title": "Numbers" }
+                { "path": "src/Maths/Numbers.md", "title": "Numbers" },
+                { "path": "src/Logic/Autoformalization.md", "title": "Autoformalization"}
             ]
         },  
         {

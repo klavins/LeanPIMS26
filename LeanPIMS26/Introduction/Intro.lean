@@ -15,26 +15,6 @@ Automated Mathematics
 Luz Elena Grisales Gómez and Nat Hurtig (TAs)
 A Pacific Institute for the Mathematical Sciences <a href="https://www.pims.math.ca/events/260817-pwoamla">Workshop</a>, held August 17-19 at the University of British Columbia.
 
-What is Happening?
-===
-
-- **The Jacobian conjecture is false** (July 2026)
-    - Claude Fable 5 + Lean
-
-- **The Erdős unit distance conjecture is false** (May 2026)
-    - OpenAI general-purpose reasoning model + mathematicians
-    - (post-hoc) Aleph Prover/Lean formalization
-
-- **The First Proof challenge** (early 2026)
-    - Open problems (to avoid GPT looking up obscure papers)
-    - Aletheia / Gemini 3 Deep Think architecture (no Lean)
-    - Ensemble of Gemini models
-
-<div class='fn'>
-<a href="https://x.com/alpoge/status/2079028340955197566">L. Alpöge</a>.
-<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/">Erdös Unit</a>.
-<a href="https://deepmind.google/blog/accelerating-mathematical-and-scientific-discovery-with-gemini-deep-think/">Deep Think</a>.
-</class>
 
 Math and AI
 ===
@@ -50,36 +30,66 @@ Math and AI
 advanced mathematics<br/> more accessible than ever.
 - Use wisely : [AI in Papers](https://ai-math.zulipchat.com/#narrow/channel/539992-Web-public-channel---AI-Math/topic/Best.20practices.20for.20incorporating.20AI.20etc.2E.20in.20papers/near/546518354), [AI Generated Papers](https://categorytheory.zulipchat.com/#narrow/channel/229111-community.3A-general/topic/AI-generated.20papers/near/546399334)
 
-AI Companies
+AI companies doing math
 - [DeepMind / AlphaProof](https://deepmind.google/blog/ai-solves-imo-problems-at-silver-medal-level/)
+- [OpenAI](https://openai.com/index/ten-advances-in-mathematics/), [Anthropic](https://www.anthropic.com/research/a-mathematical-framework-for-transformer-circuits)
 - [Aristotle] (https://aristotle.harmonic.fun/)
 - [Axiom](https://axiommath.ai/)
 - [Math, Inc](https://www.math.inc/)
 ...
 
+What is Happening?
+===
+
+- **OpenAI Solves 10 Oustanding Problems** (Aug 2026)
+    - 3 Erdös problems, first non-sofic group, ...
+    - Circuit size for permanent : Ω(n³) (from 1985) → n⁴/log n, ...
+    - OpenAI general-purpose reasoning model + [Lean certificates](https://github.com/openai/ten-proofs)
+
+- **The Jacobian conjecture is false** (July 2026)
+    - Claude Fable 5 + Lean
+
+- **The Erdős unit distance conjecture is false** (May 2026)
+    - OpenAI general-purpose reasoning model + Lean certificates
+
+- **The First Proof challenge** (early 2026)
+    - Open problems (to avoid GPT looking up obscure papers)
+    - Aletheia / Gemini 3 Deep Think architecture (no Lean)
+
+<div class='fn'>
+<a href="https://openai.com/index/ten-advances-in-mathematics/">OpenAI 10 Problems</a>;
+<a href="https://x.com/alpoge/status/2079028340955197566">L. Alpöge</a>;
+<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/">Erdös Unit</a>;
+<a href="https://deepmind.google/blog/accelerating-mathematical-and-scientific-discovery-with-gemini-deep-think/">DeepThink</a>.
+</class>
+
+
 Moral and Ethical Issues
 ===
 
 - Leiden Declaration on Artificial Intelligence and Mathematics. [[link]](https://leidendeclaration.ai/)
-    - "Technologies that draw extensively on the published mathematical commons undermine the traditional system of attribution.""
+    - "... draw extensively on the published mathematical commons...""
     - Access to models is expensive and therefore not uniform
 
 - Jun–Yong Park, Automation Without Understanding:
 Why the United States must preserve mathematical capacity in the age of AI. [[link]](https://arxiv.org/pdf/2607.06377)
-    - "Mathematical capacity is not a stockpile of theorems. It is a community of people transformed, by years of rigorous training, into minds able to see abstract structure inside complexity."
+    - "Mathematical capacity is not a stockpile of theorems. It is a community of people ..."
 
-- Jeremy Avigad, Is Mathematics Obsolete? [[link]](https://arxiv.org/abs/2502.14874)
-    - "AI offers us new means to discover and understand phenomena that would otherwise remain opaque to us, to think and reason better, and to make better decisions"
+- Terrance Tao, Mathematics in the Age of AI [[link]](https://www.youtube.com/watch?v=sxAe4HJceFQ)
+    - Why do we do mathematics?
+    - "When a measure becomes a target, it ceases to be a good measure" (Goodhart)
 
-- Jack Conte, Change. [[link]](https://www.youtube.com/watch?v=Ue9-zkAz59A)
+- Will AI ever be able to conjecture?
+
+<div class='fn'>Jack Conte, <a href="https://www.youtube.com/watch?v=Ue9-zkAz59A">Change</a>.
 
 
 Proof Assistants
 ===
 
-- LLMs are better than most programmers at coding
+- The Curry-Howard Isomorphism: math *is* coding, and AI is good at coding
 
-- The Curry-Howard Isomorphism: math *is* coding
+- Main goal of this course: Understand how code can provides ground truth.
 
 - Type Theory is the _lingua franca_ of formal math
     - The software and tooling has improved considerably
@@ -104,7 +114,7 @@ that, within a very reasonable time span, they can formally verify difficult ori
 Mathlib
 ===
 
-The Mathlib project and others have formalized even more.
+The [Mathlib](https://github.com/leanprover-community/mathlib4) project and others have formalized even more.
 
 <div><small><pre>
 > ls Mathlib
@@ -125,12 +135,11 @@ Control                 Lean                    RepresentationTheory
 
 Seems like a lot, but _Web of Knowledge_ lists a total of 1,342,406 mathematics papers since 1900.
 
-<div class='fn'>
-https://github.com/leanprover-community/mathlib4<br>
-https://strathmaths.wordpress.com/2013/04/17/how-much-mathematics-is-there
+<div class='fn'>Was 615506 in Jan 2026. Also:
+<a href="https://strathmaths.wordpress.com/2013/04/17/how-much-mathematics-is-there">How much math is there?</a>
 </div>
 
-<div class="fn">Was 615506 in Jan 2026 when I last checked</div>
+
 
 Course Goals
 ===
@@ -144,21 +153,14 @@ Course Goals
 Detailed Topics
 ===
 
-The representation and manipulation of mathematical knowledge symbolically
-  - Foundations of Mathematics
-  - Automated reasoning
+Specific Topics
   - The L∃∀N proof assistant
   - Vibe Proving
-
-Specific Topics
   - Type theory
   - The Curry-Howard Isomorphism
   - Basic Math : Logic, Sets, Algebra, Topology
   - Mathlib
   - Autoformalization
-
-
-
 
 
 

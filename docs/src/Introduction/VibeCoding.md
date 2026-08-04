@@ -4,8 +4,141 @@ Vibe Coding
 Mathematics is the cheapest science. Unlike physics or chemistry, it does not require any expensive equipment. All one needs for mathematics is a pencil and paper (George Pólya)†
 †You will also need a Claude Code account and a reasonably powerful laptop.
 
+
+Claude Code
+===
+
+Claude code runs locally on your computer.
+- It can read and write files of pretty much any type.
+- It can interact with Lean directly using the Lean LSP
+- It can spawn agents to work on specific tasks (e.g. code reviews, refactors)
+- It can search the web and download content
+
+Tools
+- A tool is an executable capability that lives outside Claude Code.
+- For example: Bash (and everything you can invoke from Bash), Read, Edit, WebSearch, or tools for talking to Lean
+
+Skills
+- A skill is a set of packaged instructions that load into the LLM context
+— For example: markdown playbooks that activate when you invoke them or when their trigger conditions match.
+
+<div class='fn'>Other similar agentic coding tools include Cursor, Github CoPilot, and OpenAI Codex.</div>
+
+What is the Lean LSP?
+===
+
+- The **Lean Language Server Protocol** is Lean 4's built-in language server — the same process that powers VS Code's Lean experience.
+
+- It compiles your file incrementally and serves structured queries over the Language Server Protocol: diagnostics (errors/warnings), proof goals at a cursor position, hover types and docs, completions, and go-to-definition. Everything the InfoView shows you comes through it.
+
+- Claude talks to it through an MCP server [lean-lsp-mcp](https://github.com/oOo0oOo/lean-lsp-mcp) that wraps the language server and exposes its queries as tools Claude can use.
+
+- Python interface: [leanclient](https://github.com/oOo0oOo/leanclient)
+
+- Documentation [here](https://github.com/leanprover/lean4/blob/master/src/Lean/Server/README.md)
+
+
+Installing
+===
+
+- [Claude Code](https://claude.com/product/claude-code) -- just follow the instructions
+
+- Installing Lean MCP
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh     # or: brew install uv`
+claude mcp add --scope user lean-lsp -- uvx lean-lsp-mcp
+```
+
+- Installing Lean Skills
+```bash
+claude plugin marketplace add cameronfreer/lean4-skills
+claude plugin install lean4@lean4-skills
+```
+
+- Running
+```bash
+claude
+```
+
+- Adjusting effort
+```none
+/model
+```
+
+
+Demo
+===
+
+I entered the prompt:
+
+> Create the file LeanPIMS26/Introduction/cc-demo.lean. In that file, implement mergesort, proving it terminates. Run #eval on a few examples of different types of lists. Then prove that mergesort always results in a sorted list. Put this result in a theorem. The proofs to any theorems should be less than 20 lines long, so you may need to define lemmas that work out intermediate results. Do not use all of mathlib, just what you need from lists and tactics. Iterate on the file using the LSP until there are no errors remaining. Do not add comments.
+
+
+I waited for 7m, 14s and got 99 lines of code with the ultimate theorem:
+
 ```lean
+theorem msort_sorted (htot : ∀ a b : α, a ≤ b ∨ b ≤ a)
+  : ∀ l : List α, Sorted (msort l)
+```
+
+The file contains no imports. Claude reinvented total orders and the `Sorted` predicate.
+
+Refining
+===
+
+Fixing some issues:
+
+> A few issues to fix: There should be a mathlib class for a total order, so use that. Don't separate out variable definitions. Rather, add them to the defs and theorems you state so they are clear from reading them. And always use " := by" for theorems instead of jumping right in. Finally, do a pass through the file as though you were Leo DeMoura himself checking for proper idiomatic use of Lean4.
+
+Which produced
+
+```lean
+theorem sorted_mergeSort {α : Type*} [LinearOrder α] (l : List α) : Sorted (mergeSort l) := by
+  fun_induction mergeSort l with
+  | case1 => exact .nil
+  | case2 a => exact .cons True.intro .nil
+  | case3 a b rest ih₁ ih₂ => exact sorted_merge ih₁ ih₂
+```
+
+
+Issues
+===
+
+It is super important to look at the definitions. In this case, `Sorted` is correct, but the name `LowerBound` is very misleading. It should probably be called `LeHead` since it just checks that a is `≤` the head of a list.
+
+```lean
+def LowerBound {α : Type*} [LE α] (a : α) : List α → Prop
+  | [] => True
+  | b :: _ => a ≤ b
+
+inductive Sorted {α : Type*} [LE α] : List α → Prop where
+  | nil : Sorted []
+  | cons {a : α} {l : List α} : LowerBound a l → Sorted l → Sorted (a :: l)
+```
+
+I said _just write Sorted directly without using the helper_ and it produced
+
+```lean
+inductive Sorted {α : Type*} [LE α] : List α → Prop where
+  | nil : Sorted []
+  | single (a : α) : Sorted [a]
+  | cons {a b : α} {l : List α} : a ≤ b → Sorted (b :: l) → Sorted (a :: b :: l)
+```
+
+Exercises
+===
+
+<ex /> Repeat the demo here on a subject of your choosing. If you are new to Lean expect to over- or underestimate on your first few attempts.
+
+<ex /> Ask Claude Code to do all the exercises in the LEANPIMS26 materials. Have it put the results somewhere like LEANPIMS26/Solutions. Don't look them though unless you get stuck!
+
+
+
+```lean
+--hide
 end LeanW26
+--unhide
 ```
 
 License

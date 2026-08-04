@@ -1,6 +1,8 @@
 
 Vibe Proving
 ===
+In mathematics the art of proposing a question must be held of higher value than solving it.
+Georg Cantor
 
 ```lean
 end LeanW26

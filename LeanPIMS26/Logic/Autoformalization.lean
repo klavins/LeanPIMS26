@@ -18,8 +18,8 @@ namespace LeanW26
 /-
 Autoformalization
 ===
-Science is what we understand well enough to explain to a computer. Art is everything else we do.
-From the Forward by Don Knuth to Petkovˇsek, Wilf, and Zeilberger, <i>A=B</i>, Addison Wesley, 1997.
+In mathematics the art of proposing a question must be held of higher value than solving it.
+George Cantor
 -/
 
 end LeanW26
