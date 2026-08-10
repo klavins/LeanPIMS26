@@ -53,7 +53,7 @@ The return type of the function is also `ℕ`.
 
 You can (usually) evaluate a function using `#eval`. For example,  -/
 
-#eval f1 4
+#eval f1 4            -- 5
 
 /-
 If Expressions
@@ -70,7 +70,7 @@ def f2 (x : ℕ) : ℕ :=
 
 /- For example: -/
 
-#eval f2 4
+#eval f2 4         -- 0
 
 /- ***Important***: Lean is *not* a procedural language. The above is not interpreted
 as telling the CPU which branch to take in some assembly language.
@@ -78,7 +78,7 @@ as telling the CPU which branch to take in some assembly language.
 Rather, an `if` statement is a first class expression. For example, we can write:
 -/
 
-#eval (if 3 < 4 then 1 else 2)^2 + (if Even 9 then 3 else 4)
+#eval (if 3 < 4 then 1 else 2)^2 + (if Even 9 then 3 else 4)      -- 5
 
 /-
 Let Expressions
@@ -92,11 +92,11 @@ def f3 (x : ℕ) : ℕ :=
   let y := x*x
   y+1
 
-#eval f3 4
+#eval f3 4           -- 17
 
 /- Similarly, this is not a control flow situation. For example, you can write: -/
 
-#eval (let x := 5; x*2) + (let x := 3; x-1) -- 12
+#eval (let x := 5; x*2) + (let x := 3; x-1)            -- 12
 
 /-
 Currying
@@ -108,21 +108,21 @@ When a function is defined with multiple arguments, as in
 def f4 (x y : ℕ) := 2*x + y
 
 /-
-it is really being defined as a _a function that takes an argument and returns a function
-that takes an argument that returns an expression_. The above is in fact shorthand for:
+it is _a function that takes an argument and returns a function
+that takes an argument that returns an expression_. The above is shorthand for:
 -/
 
 def f4' := fun (x : ℕ) => fun (y : ℕ) => 2*x + y
 
 /-
-Thus, if we just pass one argument to `f4` we a get _partial application_, -/
+If we just pass one argument to `f4` we a get _partial application_, -/
 
 def f5 := f4 10
 
 /-
-The function `f5` in this case is equivalent to `def f5' (y: ℕ) := 20 + y`.
+The function `f5` is equivalent to `def f5' (y: ℕ) := 20 + y`.
 
-Testing these functions gives:
+Testing gives:
 -/
 
 #eval f4 10 1    -- 21
@@ -134,8 +134,7 @@ Testing these functions gives:
 Functions that Operate on Functions
 ===
 
-Functions are objects. You can pass them as arguments
-and return them.
+You can functions them as arguments and return them.
 
 For example:
 
@@ -148,7 +147,8 @@ def do_twice (f : ℕ → ℕ) (x : ℕ) := f (f x)
 #eval do_twice (do_twice f1) 3        -- 7
 
 theorem d2 : do_twice (do_twice f1) 3 = 7 := by
-  unfold f1 do_twice
+  unfold do_twice
+  -- Goal: f1 (f1 (f1 (f1 3))) = 7
   sorry
 
 /-
@@ -156,7 +156,7 @@ Unnamed Variables
 ===
 
 If a function does not use an argument, the Lean linter complains
-that you have an unused variable. You can get rid of this with `_` -/
+you have an unused variable. You can get rid of this with `_` -/
 
 def h1 (x : ℕ) := 1             -- Linter says: unused variable `x`
 def h2 (_ : ℕ) := 1
@@ -191,8 +191,9 @@ even, and once otherwise. Then try these`evals:
 Constructors
 ===
 
-Many types in Lean are defined *inductively* with *constructors*. For example, there are two
-ways to make a natural number.
+Many types in Lean are defined *inductively* with *constructors*.
+
+For example, there are two ways to construct a natural number.
 -/
 
 #print Nat -- constructors:
@@ -205,13 +206,14 @@ ways to make a natural number.
 def nonzero (x : ℕ) : Bool :=
   match x with
   | Nat.zero => false
-  | Nat.succ k => true
+  | Nat.succ _k => true
 
 #eval (nonzero 0, nonzero 1234)
 
 /-
 
-<div class="fn">Numbers like <tt>3</tt> are just shorthand for <tt>zero.succ.succ.succ</tt></div>
+<div class="fn">Numbers like <tt>3</tt> are essentially
+shorthand for <tt>zero.succ.succ.succ</tt></div>
 
 
 
@@ -219,9 +221,7 @@ Match is a General Pattern Matcher
 ===
 -/
 
-/- You just have to cover all possibilities.
-
-In this context, `_` matches anything that hasn't been listed yet. -/
+/- In this context, `_` matches anything that hasn't been listed yet. -/
 
 def is_3_or_12 (x : ℕ) : Bool :=
   match x with
@@ -260,7 +260,7 @@ def fct (n : ℕ) : ℕ :=
 When Recursion Doesn't Work
 ===
 
-Recursion has to be well founded, otherwise you may get an infinite loop,
+Recursion must be well founded, otherwise you may get an infinite loop,
 which Lean does not allow:
 -/
 
@@ -268,16 +268,10 @@ which Lean does not allow:
 
 /- Which results in the error:
 
-> fail to show termination for
-  LeanW26.not_ok
-> with errors
-> failed to infer structural recursion:
-> Not considering parameter x of LeanW26.not\_ok:
->   it is unchanged in the recursive calls
-> no parameters suitable for structural recursion
-
-> well-founded recursion cannot be used, 'LeanW26.not_ok' does not take any (non-fixed) arguments
-```
+> failed to show termination for `not\_ok`
+> with errors failed to infer structural recursion:
+> Not considering parameter `x`: it is unchanged in the recursive calls
+> no parameters suitable for structural recursion ...
 
 In other situations, you might define a function that does eventually stop but Lean
 may not be able to figure it out, requiring you to also supply a proof
@@ -287,7 +281,7 @@ of termination.
 Head Recursion
 ===
 
-They way we wrote `fct`
+The function `fct`
 
 ```lean
 def fct (n : ℕ) : ℕ :=
@@ -296,7 +290,7 @@ def fct (n : ℕ) : ℕ :=
   | ℕ.succ k => n * (fct k)
 ```
 
-it is *head recursive*. The expression evaluated
+it is *head recursive*. The expression is evaluated
 by growing it and then reducing it.
 
 ```lean
@@ -345,23 +339,23 @@ def fact2 (n : ℕ) : ℕ :=
     | k+1   => aux k (acc * (k + 1))
   aux n 1
 
-#eval fact2 5
+#eval fact2 20      -- 2432902008176640000
 
-#check fact2.aux
+/- The underlying function remains accessible: -/
+
+#check fact2.aux     -- ℕ → ℕ → ℕ
 
 
-/-
-The resulting code is usually more compact.
--/
+
 
 /-
 A Look Ahead
 ===
 
-We can write a proof that these two definitions yield the same function!
+Here is a proof that these two definitions yield the same function!
 -/
 
-theorem helper (n acc : ℕ) : factAux n acc = acc * fct n := by
+lemma helper (n acc : ℕ) : factAux n acc = acc * fct n := by
   induction n generalizing acc with
   | zero => simp [factAux, fct]
   | succ k ih =>
@@ -374,7 +368,7 @@ theorem fct_fact : fact = fct := by
   unfold fact
   simp[helper n 1]
 
-/- We'll explain this later. -/
+/- We'll explain proofs later. -/
 
 /-
 Exercises
@@ -401,22 +395,20 @@ two values in the sequence.
 -/
 
 
-
 /-
 Booelans vs Propositions
 ===
 
-`Bool` has possible values `true` and `false`.-/
+ ➡️ `Bool` has possible values `true` and `false`.-/
 
 #check true
 #check false
 
-/- It is used in programming. It gives a computable value that can be used in downstream
-programming logic. For example. -/
+/- `Bool` gives a value that can be used in downstream logic. For example. -/
 
 def is_even (x : ℕ) : Bool := x % 2 = 0
 
-/- `Prop` has values that are *proofs*. -/
+/-  ➡️ `Prop` has values that are *proofs*. -/
 
 def my_prop : Prop := ∀ x : ℕ, x ≥ 0
 def my_proof : my_prop := fun x => Nat.zero_le x
@@ -452,9 +444,7 @@ defined types of type `Prop`. -/
 
 We will have *much* to say about the type `Prop` later in this course.
 
-Like, *a lot* to say.
-
-Really.
+Like, *a lot* to say. Really.
 
 
 Number Types
@@ -478,8 +468,6 @@ def invert_rat (x : ℚ) : ℚ := x.den / x.num
 
 #eval invert_rat (2/4)  -- 2
 
-/- VS Code will give you completion possibilities for you to explore
-if you type a `.` and wait a second.-/
 
 /-
 Real Numbers
@@ -570,7 +558,6 @@ of `n` copies of `c`.
 /-
 Lists
 ===
-Another example of an inductively defined type is `List`.
 
 Lists are either empty or made by pushing a value onto the
 front of some other list.
@@ -580,15 +567,15 @@ front of some other list.
             -- List.nil : {α : Type u} → List α
             -- List.cons : {α : Type u} → α → List α → List α
 
-def f6 (L : List ℕ) : ℕ :=
+def first (L : List ℕ) : ℕ :=
   match L with
   | List.nil => 0
   | List.cons x _M => x
 
 /- For example: -/
 
-#eval f6 [1,2,3]  -- 1
-#eval f6 []       -- 0
+#eval first [1,2,3]  -- 1
+#eval first []       -- 0
 
 /-
 List Notation
@@ -636,6 +623,8 @@ def map_poly {A : Type} {B : Type} (f : A → B) (L : List A) : List B :=
 
 Here, `map_poly` is a **polymorphic** function and `List A` is a **parameterized** type.
 
+_We will explore types in great detail in the next few modules._
+
 Implicit vs Explicit Variables
 ===
 
@@ -660,6 +649,9 @@ def map_poly_explicit (A : Type) (B : Type) (f : A → B) (L : List A) : List B 
 
 #eval String.ofList (map_poly_explicit
                      Char Char Char.toUpper ['u','w'])
+
+/- This pattern is used heavily in Lean, making functions and especially
+theorems much easier to use. -/
 
 
 /-
@@ -726,7 +718,7 @@ for the comparison function. But the more _Lean_ way to do it is to require
 `A` to have instances of `LE` and `DecidableRel` using the `[...]` notation.
 Give it a try.
 
-We'll talk about _classes_ and _instances_ next week.
+We'll talk about _classes_ and _instances_ soon.
 -/
 
 

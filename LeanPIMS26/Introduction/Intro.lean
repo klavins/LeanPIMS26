@@ -77,7 +77,7 @@ Why the United States must preserve mathematical capacity in the age of AI. [[li
 
 - Terrance Tao, Mathematics in the Age of AI [[link]](https://www.youtube.com/watch?v=sxAe4HJceFQ)
     - Why do we do mathematics?
-    - "When a measure becomes a target, it ceases to be a good measure" (Goodhart)
+    - "We will transition from an era of **proof scarcity** to **proof abundance**."
 
 - Will AI ever be able to conjecture?
 
@@ -230,7 +230,6 @@ I would like to acknowledge the students who took my special topics course offer
 Winter of 2025 and again in the Winter of 2027  at the University of Washington.
 We all learned Lean together.
 Much of the material here was developed in response to their questions and ideas.
-At first,
 Each time I teach this course I start out a few weeks ahead,
 and by the end of the course I am a few weeks behind.
 

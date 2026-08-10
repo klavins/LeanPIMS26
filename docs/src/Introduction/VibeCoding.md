@@ -1,5 +1,5 @@
 
-Vibe Coding
+Vibe Proving
 ===
 Mathematics is the cheapest science. Unlike physics or chemistry, it does not require any expensive equipment. All one needs for mathematics is a pencil and paper (George Pólya)†
 †You will also need a Claude Code account and a reasonably powerful laptop.
@@ -66,8 +66,32 @@ claude
 /model
 ```
 
+Demo 1: Helping with Proofs
+===
 
-Demo
+Navigate to `Maths/Algebra.lean` line 876 where it says
+
+```lean
+theorem one_inv : (one:F)⁻¹ = one := sorry
+```
+
+Then prompt with
+
+> In LeanPIMS26/Maths/Algebra.lean, do the proof of the exercise on line 876.
+
+which gives
+
+```lean
+theorem one_inv : (one:F)⁻¹ = one := by
+  have h : (one:F) * one⁻¹ = one := mul_inv_prop one_ne_e
+  rw[mul_id_left] at h
+  exact h
+```
+
+Claude writes to the file, checks the LSP for errors, iterates until the proof typechecks, and provides a summary (not shown).
+
+
+Demo 2: Autoformalizing
 ===
 
 I entered the prompt:
@@ -117,7 +141,7 @@ inductive Sorted {α : Type*} [LE α] : List α → Prop where
   | cons {a : α} {l : List α} : LowerBound a l → Sorted l → Sorted (a :: l)
 ```
 
-I said _just write Sorted directly without using the helper_ and it produced
+I prompted _just write Sorted directly without using the helper_ and it produced
 
 ```lean
 inductive Sorted {α : Type*} [LE α] : List α → Prop where
@@ -126,10 +150,12 @@ inductive Sorted {α : Type*} [LE α] : List α → Prop where
   | cons {a b : α} {l : List α} : a ≤ b → Sorted (b :: l) → Sorted (a :: b :: l)
 ```
 
+
+
 Exercises
 ===
 
-<ex /> Repeat the demo here on a subject of your choosing. If you are new to Lean expect to over- or underestimate on your first few attempts.
+<ex /> Repeat the demos here on subjects of your choosing. If you are new to Lean expect to over- or underestimate on your first few attempts.
 
 <ex /> Ask Claude Code to do all the exercises in the LEANPIMS26 materials. Have it put the results somewhere like LEANPIMS26/Solutions. Don't look them though unless you get stuck!
 
