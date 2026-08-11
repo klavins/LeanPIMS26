@@ -98,7 +98,6 @@ I entered the prompt:
 
 > Create the file LeanPIMS26/Introduction/cc-demo.lean. In that file, implement mergesort, proving it terminates. Run #eval on a few examples of different types of lists. Then prove that mergesort always results in a sorted list. Put this result in a theorem. The proofs to any theorems should be less than 20 lines long, so you may need to define lemmas that work out intermediate results. Do not use all of mathlib, just what you need from lists and tactics. Iterate on the file using the LSP until there are no errors remaining. Do not add comments.
 
-
 I waited for 7m, 14s and got 99 lines of code with the ultimate theorem:
 
 ```lean
@@ -202,7 +201,7 @@ Shows `SimplyConnectedSpace ZigZag`.
 
 Mathlib's IsAddQuotientCoveringMap.fundamentalGroupEquiv (quotient covering + simply connected total space ⟹ π₁(base) ≅ deck group) plus removing the ᵐᵒᵖ.
 
-The plan's reconnaissance confirmed Mathlib still has no π₁(S¹) ≅ ℤ — yet with the same two 2025 theorems it now follows in about three lines from AddCircle.isAddQuotientCoveringMap_coe (ℝ is simply connected). That's either a nice student project or a small Mathlib PR.
+The plan's reconnaissance confirmed Mathlib still has no π₁(S¹) ≅ ℤ — yet with the same two 2025 theorems it now follows in about three lines from AddCircle.isAddQuotientCoveringMap_coe (ℝ is simply connected). That's either a nice student project or a small Mathlib PR!
 
 
 Exercises
