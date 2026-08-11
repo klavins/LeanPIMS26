@@ -29,25 +29,30 @@ Structures so far have mostly been a **carrier type** plus **operations on that 
 - `Poset α` has `le : α → α → Prop`
 - `Ring R`, `Lattice α`, `Field F`, ...
 
-Categories don't fit cleanly into this pattern! There are multiple types, and
-universes make a return when we want to model certain categories.
+Categories don't fit into this pattern! There are multiple types. This causes
+dependent typing woes, and universes make a return when we want to model
+certain categories.
 
-An additional side quest: Mathlib's category theory definitions are pretty
-different from the "straightforward" definitions in this course.
+Additionaly, Mathlib's category theory definitions are different from the
+"straightforward" way to define math ideas seen in this course. We'll take a
+look at Mathlib's definitions at the end.
+
+This lecture is focused on *definitions and statements*, not proofs: LLMs might
+be great for filling in a `sorry`, but humans need to make sure top-level
+definitions represent the right things!
 -/
 
 /-
 What We Are Not Doing
 ===
 
-We won't be diving too deep into category theory's ideas. The plan:
+We won't be diving deep into category theory. The plan:
 - Categories themselves
 - Functors between categories
 
-Most of our time will be spent on Lean's internals and Mathlib's design, using
-category theory as a vehicle for prodding at them. Nat is a computer scientist,
-and not a category theorist!
-
+Most of our time will be spent on Lean and Mathlib, using category theory as a
+vehicle for prodding at them. Nat is a computer scientist, and not a category
+theorist!
 -/
 
 /-
@@ -63,8 +68,8 @@ A category consists of
 
 subject to: composition is associative, and identities do nothing.
 
-Kinda like a monoid over arrows, but composition isn't defined for all
-elements...
+Kinda like a monoid over arrows, but composition is only defined for arrows
+whose objects line up.
 -/
 
 /-
@@ -96,57 +101,59 @@ universe u v
 Conventions
 ===
 
-**Composition order.** `comp f g` means "`f`, then `g`": diagrammatic order, following
-the arrows. Textbooks overwhelmingly write `g ∘ f` instead.
+**Composition order.** `comp f g` means "`f`, then `g`": diagrammatic order,
+following the arrows. Others write `g ∘ f` instead; "`g` after `f`".
 
-**Universe order: arrow universe first.** Writing the binders out as `.{v, u}`
-doesn't just name the universes; it orders them. Lean binds universes by
-default in order of first appearance in definitions, and `Obj : Type u` comes
-first, so you'd get `Category.{u, v}`. But when you write `Category X`, Lean
-reads `u` straight off `X`, while *nothing* determines `v`. The one you must
-supply by hand is the arrow universe, and `.{...}` fills in positionally, so it
-has to come first, or you'd be writing `Category.{_, 7} X` every time you
-needed to specify the arrow universe. We want `Category.{7} X`.
+-/
 
-(This is also why `universe u` is declared *after* the structure: an explicit `.{v, u}`
-binder collides with a file-level universe of the same name.)
+#check Category.comp -- self.Hom A B → self.Hom B C → self.Hom A C
+
+/-
+**Universe order.** Lean binds universes by default in order of first
+appearance in definitions, and `Obj : Type u` comes first, so you'd get
+`Category.{u, v}`. When you write `Category X`, Lean can read `u` straight off
+`X`, but nothing determines `v`. Putting `v` first lets you write We want
+`Category.{7} X` instead of `Category.{_, 7} X`.
 -/
 
 /-
-The Category of Types
+Exercise: The Category of Types
 ===
 
-Lean itself is a category!
+Lean itself forms a category!
 - Objects are types
 - Arrows are functions
 - Identity and composition are identity and composition
 -/
 
 def Types : Category (Type u) where
-  Hom A B := A → B
-  id _A := fun a => a
-  comp f g := fun a => g (f a)
+  Hom A B := A → B -- the type of functions from `A` to `B`
+  id _A := fun a => a -- aka `id`, the identity function on `_A`
+  comp f g := fun a => g (f a) -- could have been written g ∘ f
   id_comp _A := rfl
   comp_id _A := rfl
   assoc _f _g _h := rfl
 
 /-
+<ex/>
 Why didn't I need to specify the arrow universe level? What *is* the arrow universe level?
 -/
+
+set_option pp.universes true in -- trick to show universes in the next output
+#check Types -- Category.{?} (Type u)
 
 /-
 Revisiting Monoids
 ===
 
-Take exactly one object. Its arrows to itself are the elements of `M`, and composition
-is multiplication. The category axioms are then exactly the monoid axioms.
+The category axioms (identity, association) look close to the monoid axioms:
 -/
 
 namespace Temp
 
 class Monoid (M : Type u) where
-  mul : M → M → M -- looks like composition
-  one : M -- looks like the identity
+  mul : M → M → M -- morally composition of arrows
+  one : M -- morally identity arrows
   mul_assoc {a b c : M} : mul (mul a b) c = mul a (mul b c)
   mul_id_left {a : M}   : mul one a = a
   mul_id_right {a : M}  : mul a one = a
@@ -154,7 +161,7 @@ class Monoid (M : Type u) where
 end Temp
 
 /-
-If the elements of the monoid are the arrows, what are the objects?
+If the elements of the monoid correspond to the arrows, what are the objects?
 - Arrows compose whenever objects line up
 - In a monoid, arrows always compose
 - The objects must always line up!
@@ -168,7 +175,7 @@ Use `Unit`, with its only member `() : Unit`:
 -/
 
 def OfMonoid (M : Type v) [Temp.Monoid M] : Category.{v} Unit where
-  Hom _ _ := M
+  Hom _ _ := M -- the arrows are the monoid elements
   id _ := Temp.Monoid.one
   comp f g := Temp.Monoid.mul f g
   id_comp _ := Temp.Monoid.mul_id_left
@@ -176,13 +183,17 @@ def OfMonoid (M : Type v) [Temp.Monoid M] : Category.{v} Unit where
   assoc _ _ _ := Temp.Monoid.mul_assoc
 
 /-
+Each `_` in the above definition is `() : Unit`, the only object in the category.
+-/
+
+/-
 Going in Reverse
 ===
 
-A category with exactly one object *is* a monoid: its arrows, under composition. The
-two directions together say the notions are the same one.
+A category with exactly one object *is* a monoid. With the last slide's other
+direction, we have a *kind-of* bijection between monoids and one-object categories.
 
-(`[Unique A]` says `A` has exactly one element, and `default` is that element.)
+`[Unique A]` says `A` has exactly one element, and `default` is that element.
 -/
 
 instance {A : Type u} (C : Category A) [Unique A] : Temp.Monoid (C.Hom default default) where
@@ -194,6 +205,11 @@ instance {A : Type u} (C : Category A) [Unique A] : Temp.Monoid (C.Hom default d
 
 /-
 In fact, given *any* `X : A`, the arrows `C.Hom X X` form a monoid!
+
+The "bijection" is not really an `Equiv` because the unique object type is
+dropped in the `Monoid`. Possible patches to get true bijection: `Monoid` is
+equivalent to the categories over `Unit`, or single-object categories are
+equivalent to `Monoid`s bundled with some unique type.
 -/
 
 /-
@@ -204,17 +220,13 @@ Exercise: A Preorder Is a Thin Category
 
 Hint: unlike `Monoid`, the *objects* here are the elements of `X`. Then define
 arrows using the preorder's comparator: one arrow `Hom A B` iff `A ≤ B`.
--/
-
-#check Preorder
-
-/-
 
 Mathlib's `Preorder` is the `Poset` of the Relations deck minus antisymmetry: `≤` is
 reflexive (`le_refl`) and transitive (`le_trans`), but two elements can each be below the
 other without being equal.
 
-If you get an error about mismatched types, you're doing something right!
+If you get an error about mismatched types, you've successfully followed the
+slightly misleading hint!
 
 -/
 
@@ -250,15 +262,14 @@ Plainly, we need a type, not a proposition, and `A ≤ B` is a proposition!
 PLift Saves the Day
 ===
 
-`PLift` (`Prop` lift) has a one-field structure that puts the proof in a box.
-It is `PLift`, with constructor `PLift.up` and projection `PLift.down`:
+`PLift` has a one-field structure that puts the proof in a `Type`-flavored box.
+Constructor `PLift.up` and projection `PLift.down`:
 ```lean
     PLift.up   : α → PLift α
     PLift.down : PLift α → α
 ```
 We can now define `Hom A B := PLift (A ≤ B)`. Because `PLift (A ≤ B) : Type`
 the whole category has arrow universe `v := 0`.
-
 -/
 
 def OfPreorder (X : Type u) [Preorder X] : Category.{0} X where
@@ -270,13 +281,18 @@ def OfPreorder (X : Type u) [Preorder X] : Category.{0} X where
   assoc _ _ _ := rfl
 
 /-
+So ends our core definitions involving `Category`.
+-/
+
+/-
 Functors
 ===
 
 Categories have structure, so there should be structure-preserving maps between them.
 A **functor** `F : Functor C D` sends objects to objects and arrows to arrows: it takes
 an arrow `Hom A B` to an arrow `Hom (F A) (F B)`, and preserves identities and
-composition. Mathlib writes this type using `⥤`.
+composition. Mathlib writes this type using `⥤` (like many things in Mathlib,
+you can type the symbol using `\functor`).
 
 The *type* of `map` uses the *value* of `obj`. This will cause us some trouble later!
 -/
@@ -297,7 +313,8 @@ universe u₁ u₂ u₃ v₁ v₂
 Identity and Composition
 ===
 
-Functors compose, and every category has an identity functor. Both fall straight out.
+Functors compose, and every category has an identity functor. Neither
+definition is too much proof burden.
 -/
 
 def Functor.id {X : Type u₁} (C : Category X) : Functor C C where
@@ -336,7 +353,7 @@ def OfMonoidHom {M N : Type u} [Temp.Monoid M] [Temp.Monoid N]
 
 /-
 <ex/> A monotone map is exactly a functor between the corresponding preorder
-categories. Build that one too. (`Monotone f` unfolds to `a ≤ b → f a ≤ f b`)
+categories. Build that one too (`Monotone f` unfolds to `a ≤ b → f a ≤ f b`).
 -/
 
 def OfMonotone {X Y : Type u} [Preorder X] [Preorder Y]
@@ -395,7 +412,7 @@ theorem Functor.ext {X Y : Type u₁} {C : Category X} {D : Category Y}
   cases F with | mk Fobj Fmap Fmap_id Fmap_comp =>
   cases G with | mk Gobj Gmap Gmap_id Gmap_comp =>
   have objects_equal : Fobj = Gobj := funext hobj
-  subst objects_equal
+  subst objects_equal -- rewrites Gmap's type!
   simp
   ext
   apply hmap
@@ -439,14 +456,17 @@ theorem ext {F G : C ⥤ D} (h_obj : ∀ X, F.obj X = G.obj X)
 Even `eqToHom` isn't good enough
 ===
 
-Mathlib puts this lemma in `Mathlib/CategoryTheory/EqToHom.lean` rather than
-with the other functor lemmas, under this docstring:
+Mathlib puts this `Functor.ext` lemma in `Mathlib/CategoryTheory/EqToHom.lean`
+rather than with the other functor lemmas, with this docstring:
 
 > *Proving equality between functors. This isn't an extensionality lemma,
 > because usually you don't really want to do this.*
 
-Even though `eqToHom` avoids transport at the surface,
-`eqToHom` itself uses transport.
+Even though `eqToHom` avoids transport at the surface, `eqToHom` itself uses
+transport. Depending on your goals, transport can sometimes be a flag that
+something has gone wrong in the formalization.
+
+Category theorists prefer a different, weaker equivalence relation on functors.
 -/
 
 /-
@@ -472,10 +492,11 @@ A *natural transformation* `η : F ⟶ G` is a transformation from one **functor
 to another, with composition and identities.
 
 Two functors are **isomorphic** whenever there exist natural transformations
-`η : F ⟶ G` and `ε : G ⟶ F` where `η` then `ε` and `ε` then `η` are both the
-identity natural transformations.
+`η : F ⟶ G` and `ε : G ⟶ F` where both
+* `η` composed with `ε` is the identity natural transformation, and
+* `ε` composed with `η` is the identity natural transformation.
 
-Two functors `C ⥤ D` with provably different object maps can be isomorphic!
+Hence two functors `C ⥤ D` with provably different object maps can be isomorphic!
 -/
 
 /-
@@ -497,17 +518,17 @@ isomorphisms.
 Topic Change: What Universe Is `Types` In?
 ===
 
-We built `Types`, the category of Lean types with functions as arrows, earlier.
-What universe does it live in?
+We built `Types`, the category with `Type u` as objects and functions as
+arrows, earlier. What universe does it live in?
 -/
 
-set_option pp.universes true in -- trick to show universes in the next output
-#check @Types
+set_option pp.universes true in
+#check @Types.{u} -- Category.{u, u + 1}
 
 /-
-Arrows in `Type u`, objects in `Type (u+1)`. Both are forced.
+Arrows in `Type u`, objects in `Type (u + 1)`.
 
-The objects *are* the type `Type u`, and `Type u : Type (u+1)`. The arrows are
+The objects *are* the types with type `Type u`, and `Type u : Type (u + 1)`. The arrows are
 functions `A → B` with `A B : Type u`, and a function type lands in the `max`
 of its two universes, here just `u`.
 
@@ -515,7 +536,7 @@ So `Types` isn't one category, but a family of categories, one for each `u`.
 -/
 
 /-
-How a Universe Gets Computed
+Universe of `Category.{v, u}`
 ===
 
 **Functions** land in the `max` of their two universes.
@@ -525,8 +546,8 @@ field `n : ℕ`, then its universe is at least `Type 0` because `ℕ : Type 0`. 
 it *stores* a type `obj : Type u`, then because `Type u : Type (u + 1)`, the
 structure's universe is at least `Type (u + 1)`.
 
-**Parameters and indices** don't directly count. `Category` takes its objects
-as a parameter, so they don't contribute.
+**Parameters and indices** don't directly count until they're used elsewhere in
+the definition. `Category` takes its objects as a parameter.
 
 Combining these together, `Category` stores three non-`Prop` fields:
 * `Hom : Obj → Obj → Type v`, which lands in `Type (max u (v + 1))` because
@@ -573,7 +594,7 @@ automatic coercion: Lean's universes are **non-cumulative***.
 /-
 Just like PLift saved us by lifting `Prop` to `Type 0`, so `ULift` lifts `Type
 s` to `Type (max s r)`, effectively allowing us to increase the universe level
-of anything by writing it:
+of anything:
 -/
 
 #check ULift -- ULift.{r, s} (α : Type s) : Type (max s r)
@@ -589,8 +610,8 @@ def uliftFunctor : Functor Types.{u} Types.{max u v} where
   map_comp _ _ := rfl
 
 /-
-\* Rocq, an alternative to Lean in some manners, has cumulative universes! This
-is a language design choice, not some dependent type theory snag.
+\*Rocq, an alternative to Lean in some manners, has cumulative universes! So is
+a language design choice, not some dependent type theory snag.
 -/
 
 /-
@@ -611,7 +632,7 @@ def Cats : Category (Σ X : Type u, Category.{v} X) where
 
 set_option pp.universes true in
 #check Cats -- arrows are (max u v); objects are (max (u + 1) (v + 1))
--- => Cats : Type (max (u + 1) (v + 1))
+-- hence Cats : Type (max (u + 1) (v + 1))
 
 /-
 Arrows in `max u v`: a functor is no bigger than the categories it joins.
@@ -631,7 +652,7 @@ the `u + 1` comes from storing the `X : Type u`.
 example : Σ X : Type (max (u+1) (v+1)), Category.{max u v} X := ⟨_, Cats.{u,v}⟩
 ```
 
-Asking for it to be an object of *itself* does not:
+But it's not one of its own objects:
 ```lean
 example : Σ X : Type u, Category.{v} X := ⟨_, Cats.{u,v}⟩
 ```
@@ -662,11 +683,11 @@ three cascading definitions where we used one to define a category:
 
 ```lean
 class Quiver (V : Type u) where
-  Hom : V → V → Type v
+  Hom : V → V → Type v -- ⟶ (\hom) is used for notation (different from \to!)
 
 class CategoryStruct (obj : Type u) : Type max u (v + 1) extends Quiver.{v} obj where
-  id   : ∀ X : obj, Hom X X
-  comp : ∀ {X Y Z : obj}, (X ⟶ Y) → (Y ⟶ Z) → (X ⟶ Z)
+  id   : ∀ X : obj, Hom X X -- 𝟙 (\b1) notation
+  comp : ∀ {X Y Z : obj}, (X ⟶ Y) → (Y ⟶ Z) → (X ⟶ Z) -- ≫ (\gg) notation
 
 class Category (obj : Type u) : Type max u (v + 1) extends CategoryStruct.{v} obj where
   id_comp : ∀ {X Y : obj} (f : X ⟶ Y), 𝟙 X ≫ f = f := by cat_disch
@@ -675,8 +696,8 @@ class Category (obj : Type u) : Type max u (v + 1) extends CategoryStruct.{v} ob
               (f ≫ g) ≫ h = f ≫ g ≫ h := by cat_disch
 ```
 
-Three differences: why multiple layered definitions, why `class` instead of
-`structure`, and what the `by cat_disch` is for.
+Three differences: multiple layered definitions, `class` instead of
+`structure`, and the `:= by cat_disch`.
 -/
 
 /-
@@ -707,7 +728,7 @@ B` is a **path**: a finite chain of quiver edges from `A` to `B`. Identity is
 the empty path, composition is concatenation.
 
 ```lean
-def Paths (V : Type u₁) : Type u₁ := V
+def Paths (V : Type u₁) : Type u₁ := V -- a type synonym; we'll see this later
 
 instance : Category.{max u₁ v₁} (Paths V) where
   Hom := fun X Y : V => Quiver.Path X Y
@@ -785,7 +806,7 @@ Lean grabs.
 -/
 
 /-
-Typeclass Synthesis is Uncontrollable
+Typeclass Synthesis is (largely) Uncontrollable
 ===
 
 From personal experience: this is very annoying! And it is working as intended.
@@ -801,6 +822,9 @@ on the same type, and got told:
 --hide
 https://github.com/leanprover/lean4/issues/952
 --unhide
+
+One can somewhat control which instances get selected via `priority` and `local
+instance` within statements, but it's finicky.
 -/
 
 /-
@@ -848,45 +872,9 @@ goals.
 uses a version of `aesop` with specifically registered rules; it also has a
 `grind` mode.
 
-The size of Mathlib justifies the presence of such a tactic. If definitions are
-changed that rename fields, or change their contents such that their proofs are
-still easy, then `cat_disch` keeps the proofs checking without any source code
-changes.
--/
-
-/-
-Mathlib is evolving: `Sort` or `Type`?
-===
-
-Our `Hom` field says `Type v`, and that is what sent the preorder exercise to
-`PLift`. We could have written `Sort v` instead. It compiles, and then `Hom A B
-:= A ≤ B` just works out of the box.
-
-Mathlib faces that choice one layer down, and changed recently:
-
---hide
-https://github.com/leanprover-community/mathlib4/pull/34228
---unhide
-```
-0e16bffea0  2026-01-27  Kevin Buzzard
-refactor: Restrict quiver homs to Type* (#34228)
-```
-
-Until January, `Quiver.Hom` was `V → V → Sort v`, so a *quiver* could have `Prop`-valued
-arrows. Categories never could: `CategoryStruct` had to `extend Quiver.{v + 1}` to force
-its arrows back into `Type v`, and that `+ 1` was littered through the library. The patch
-restricted quiver homs to `Type v` and deleted every one of them.
-
-Why can't arrows live in `Prop`? Because `Prop` is proof-irrelevant: any two
-inhabitants of a `Prop` are *definitionally* equal. So `Hom A B : Prop` would mean
-any two parallel arrows are equal, and every category would be thin. Fine for our
-preorder. Fatal for `Types`, where `Hom Bool Bool` has four distinct elements, and
-for monoids, whose elements *are* the arrows.
-
-What did not change: `Preorder.smallCategory` used `ULift (PLift (U ≤ V))` before
-the patch and still does. Thin categories always paid. What the patch bought was the
-disappearance of `Quiver.{v + 1}`; what it cost was `Prop`-valued quivers, of which
-Mathlib had exactly one.
+The size of Mathlib justifies the presence of such a tactic. If fields are
+renamed, or their contents are changed such that their proofs are still easy,
+then `cat_disch` keeps the proofs checking without any source code changes.
 -/
 
 /-
@@ -912,7 +900,7 @@ optimizing compiler that makes fancy sweaters real fast using category theory.
 Key Takeaways
 ===
 
-**Pick your encoding by what you need to *state*.** Notation and nested
+**Scale your encoding by what you need to *state*.** Notation and nested
 definitions can be a great way to focus on what matters for mature projects,
 but a time sink for new ones. A typeclass buys quick notation and synthesis but
 costs you one instance per type.
@@ -921,10 +909,9 @@ costs you one instance per type.
 not typecheck, don't jump to repairing the equality. Look for a structure that
 replaces it.
 
-**A type gets one findable instance per class.** The escape hatch is a type
-synonym, and it costs you every other instance on that type. That is what
-`Cᵒᵖ`, `αᵒᵈ` and `Multiplicative` are, and why each ships with a pair of
-crossing functions.
+**A type gets one findable instance per class.** The go-to escape hatch is a
+type synonym, and it costs you every other instance on that type. That is what
+`Paths`, `Cᵒᵖ`, and many others are.
 
 **Read Mathlib code, even if you don't use it.** The maintainers have made
 mistakes, fought battles, and documented their journeys. Take the free
