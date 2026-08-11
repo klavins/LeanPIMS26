@@ -33,7 +33,7 @@ Categories don't fit into this pattern! There are multiple types. This causes
 dependent typing woes, and universes make a return when we want to model
 certain categories.
 
-Additionaly, Mathlib's category theory definitions are different from the
+Additionally, Mathlib's category theory definitions are different from the
 "straightforward" way to define math ideas seen in this course. We'll take a
 look at Mathlib's definitions at the end.
 
@@ -138,7 +138,7 @@ def Types : Category (Type u) where
 Revisiting Monoids
 ===
 
-The category axioms (identity, association) look close to the monoid axioms:
+The category axioms (identity, associativity) look close to the monoid axioms:
 -/
 
 namespace Temp
@@ -244,8 +244,9 @@ Making sense of the universe synonyms:
     Sort 2 = Type 1
 ```
 
-`Hom` needs to return a `Type v`, which has sort `Type (v + 1)`. We're suppling
-`A ≤ B`, of type `Prop`, which has sort `Type 0`. Lean can't solve `0 = v + 1`.
+`Hom` needs to return a `Type v`, which has sort `Type (v + 1)`. We're
+suppyling `A ≤ B`, of type `Prop`, which has sort `Type 0`. Lean can't solve `0
+= v + 1`.
 
 Plainly, we need a type, not a proposition, and `A ≤ B` is a proposition!
 
@@ -847,8 +848,9 @@ to find instances, so `NatDvd` inherits **nothing**. Not `Category` (intended),
 but also not `Dvd`, `Monoid`, or `DecidableEq`. You have to wire those up
 yourself if you want them.
 
-Mathlib uses type synonyms frequently for this reason! Another fix is defining
-instances locally to a definition, but that gets old fast.
+Mathlib uses type synonyms and one-field structures frequently for this reason!
+Another fix is defining instances locally to a definition, but that gets old
+fast.
 -/
 
 /-
@@ -904,8 +906,8 @@ not typecheck, don't jump to repairing the equality. Look for a structure that
 replaces it.
 
 **A type gets one findable instance per class.** The go-to escape hatch is a
-type synonym, and it costs you every other instance on that type. That is what
-`Paths`, `Cᵒᵖ`, and many others are.
+type synonym or one-field definition, and it costs you every other instance on
+that type. That is what `Paths`, `Cᵒᵖ`, and many others are.
 
 **Read Mathlib code, even if you don't use it.** The maintainers have made
 mistakes, fought battles, and documented their journeys. Take the free
