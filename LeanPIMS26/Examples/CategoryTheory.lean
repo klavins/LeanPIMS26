@@ -77,7 +77,7 @@ The Definition in Lean
 ===
 
 The type of objects is a *parameter*. The arrows are a field, indexed by pairs of
-objects, and they each get their own universe.
+objects. Objects and arrows each are allowed to live in their own universes.
 -/
 
 structure Category.{v, u} (Obj : Type u) where
@@ -112,8 +112,8 @@ following the arrows. Others write `g ∘ f` instead; "`g` after `f`".
 **Universe order.** Lean binds universes by default in order of first
 appearance in definitions, and `Obj : Type u` comes first, so you'd get
 `Category.{u, v}`. When you write `Category X`, Lean can read `u` straight off
-`X`, but nothing determines `v`. Putting `v` first lets you write We want
-`Category.{7} X` instead of `Category.{_, 7} X`.
+`X`, but nothing determines `v`. Putting `v` first lets you write `Category.{7}
+X` instead of `Category.{_, 7} X`.
 -/
 
 /-
@@ -133,14 +133,6 @@ def Types : Category (Type u) where
   id_comp _A := rfl
   comp_id _A := rfl
   assoc _f _g _h := rfl
-
-/-
-<ex/>
-Why didn't I need to specify the arrow universe level? What *is* the arrow universe level?
--/
-
-set_option pp.universes true in -- trick to show universes in the next output
-#check Types -- Category.{?} (Type u)
 
 /-
 Revisiting Monoids
@@ -183,7 +175,8 @@ def OfMonoid (M : Type v) [Temp.Monoid M] : Category.{v} Unit where
   assoc _ _ _ := Temp.Monoid.mul_assoc
 
 /-
-Each `_` in the above definition is `() : Unit`, the only object in the category.
+Every object placeholder in the above definition is `() : Unit`, the only
+object in the category.
 -/
 
 /-
@@ -371,7 +364,7 @@ When Are Two Functors Equal?
 ===
 
 ```lean
-theorem Functor.ext_naive {X Y : Type u₁} {C : Category X} {D : Category Y}
+theorem Functor.ext_naive {X : Type u₁} {Y : Type u₂} {C : Category X} {D : Category Y}
     (F G : Functor C D)
     (hobj : ∀ A, F.obj A = G.obj A)
     (hmap : ∀ {A B} (f : C.Hom A B), F.map f = G.map f) : F = G := sorry
@@ -405,7 +398,7 @@ The repair is to say it *with* the object equality: transport `G.map f` along
 replaces `Gobj` by `Fobj` everywhere once we know they are equal.
 -/
 
-theorem Functor.ext {X Y : Type u₁} {C : Category X} {D : Category Y}
+theorem Functor.ext {X : Type u₁} {Y : Type u₂} {C : Category X} {D : Category Y}
     (F G : Functor C D)
     (hobj : ∀ A, F.obj A = G.obj A)
     (hmap : ∀ {A B} (f : C.Hom A B), F.map f = (hobj B ▸ hobj A ▸ G.map f)) : F = G := by
@@ -522,15 +515,15 @@ We built `Types`, the category with `Type u` as objects and functions as
 arrows, earlier. What universe does it live in?
 -/
 
-set_option pp.universes true in
+set_option pp.universes true in -- trick to show universes in next statement
 #check @Types.{u} -- Category.{u, u + 1}
 
 /-
 Arrows in `Type u`, objects in `Type (u + 1)`.
 
-The objects *are* the types with type `Type u`, and `Type u : Type (u + 1)`. The arrows are
-functions `A → B` with `A B : Type u`, and a function type lands in the `max`
-of its two universes, here just `u`.
+The objects *are* the types with type `Type u`, and `Type u : Type (u + 1)`.
+The arrows are functions `A → B` with `A B : Type u`, and a function type lands
+in the `imax` of its two universes, so just `u`.
 
 So `Types` isn't one category, but a family of categories, one for each `u`.
 -/
@@ -539,12 +532,13 @@ So `Types` isn't one category, but a family of categories, one for each `u`.
 Universe of `Category.{v, u}`
 ===
 
-**Functions** land in the `max` of their two universes.
+**Functions** land in the `imax` of their two universes (functions returning
+`Prop` are always `Prop`).
 
-**Structures** land in the `max` of their *fields'* universes. If it has a
-field `n : ℕ`, then its universe is at least `Type 0` because `ℕ : Type 0`. If
-it *stores* a type `obj : Type u`, then because `Type u : Type (u + 1)`, the
-structure's universe is at least `Type (u + 1)`.
+**Structures** land in the `max` of their *fields'* universes, and are never in
+`Prop`. If it has a field `n : ℕ`, then its universe is at least `Type 0`
+because `ℕ : Type 0`. If it *stores* a type `obj : Type u`, then because `Type
+u : Type (u + 1)`, the structure's universe is at least `Type (u + 1)`.
 
 **Parameters and indices** don't directly count until they're used elsewhere in
 the definition. `Category` takes its objects as a parameter.
@@ -632,7 +626,6 @@ def Cats : Category (Σ X : Type u, Category.{v} X) where
 
 set_option pp.universes true in
 #check Cats -- arrows are (max u v); objects are (max (u + 1) (v + 1))
--- hence Cats : Type (max (u + 1) (v + 1))
 
 /-
 Arrows in `max u v`: a functor is no bigger than the categories it joins.
@@ -728,6 +721,8 @@ B` is a **path**: a finite chain of quiver edges from `A` to `B`. Identity is
 the empty path, composition is concatenation.
 
 ```lean
+variable [Quiver V] -- assume a quiver on `V` is in scope
+
 def Paths (V : Type u₁) : Type u₁ := V -- a type synonym; we'll see this later
 
 instance : Category.{max u₁ v₁} (Paths V) where
@@ -788,8 +783,9 @@ instance dvdCat : Category ℕ where
   id a := ⟨⟨dvd_refl a⟩⟩
   comp f g := ⟨⟨dvd_trans f.down.down g.down.down⟩⟩
 
-example (a b : ℕ) (h : a ≤ b) : a ⟶ b := homOfLE h    -- the identical line
+example (a b : ℕ) (h : a ≤ b) : a ⟶ b := homOfLE h    -- the same line a second time
 ```
+The second line fails to typecheck!
 ```
 Type mismatch
   homOfLE h
@@ -798,10 +794,9 @@ but is expected to have type
                @Quiver.Hom ℕ catToReflQuiver.toQuiver a b
 ```
 
-The same line fails **the second time only**. Typeclass synthesis resolves
-ambiguity by priority, so `⟶` silently changed meaning and a line that
-compiled a moment ago no longer does. `#synth Category ℕ` tells you which one
-Lean grabs.
+The same line fails **the second time only**. Typeclass synthesis resolves the
+new category instance the second time, and doesn't try the first instance after
+the second fails to typecheck.
 
 -/
 
@@ -833,7 +828,6 @@ The Fix: Type Synonyms
 
 ```lean
 def NatDvd : Type := ℕ
-def NatDvd.of  (n : ℕ) : NatDvd := n
 def NatDvd.val (n : NatDvd) : ℕ := n
 
 instance : Category NatDvd where
