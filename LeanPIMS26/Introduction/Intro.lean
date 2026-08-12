@@ -41,6 +41,8 @@ AI companies doing math
 What is Happening?
 ===
 
+- **Anthropic [Improves](https://github.com/anthropics/zeta-23-lean) Riemann: 41% to 67%** (Aug 2026)
+
 - **OpenAI Solves 10 Oustanding Problems** (Aug 2026)
     - 3 Erdös problems, first non-sofic group, ...
     - Circuit size for permanent : Ω(n³) (from 1985) → n⁴/log n, ...
@@ -70,14 +72,17 @@ Moral and Ethical Issues
 - Leiden Declaration on Artificial Intelligence and Mathematics. [[link]](https://leidendeclaration.ai/)
     - "... draw extensively on the published mathematical commons...""
     - Access to models is expensive and therefore not uniform
+    - But: [Tim Gowers](https://gowers.wordpress.com/2026/07/26/thoughts-about-the-leiden-declaration/)
+
+- Jacob Tsimerman [interview](https://www.youtube.com/watch?v=6uIJdXmB4vE)
+    - "we won't just fall _naturally_ into a good equilibrium"
 
 - Jun–Yong Park, Automation Without Understanding:
 Why the United States must preserve mathematical capacity in the age of AI. [[link]](https://arxiv.org/pdf/2607.06377)
     - "Mathematical capacity is not a stockpile of theorems. It is a community of people ..."
 
 - Terrance Tao, Mathematics in the Age of AI [[link]](https://www.youtube.com/watch?v=sxAe4HJceFQ)
-    - Why do we do mathematics?
-    - "We will transition from an era of **proof scarcity** to **proof abundance**."
+    - "transition from an era of **proof scarcity** to **proof abundance**."
 
 - Will AI ever be able to conjecture?
 
