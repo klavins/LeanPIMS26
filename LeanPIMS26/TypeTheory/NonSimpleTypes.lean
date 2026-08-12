@@ -26,8 +26,10 @@ Is there a non-simply typed λ-calculus? Yes!
 Putting all of these together you get the **CoC** the **Calculus of Constructions** (λC),
 part of a well-studied framework called the *Lambda Cube*.
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Lambda_Cube_img.svg/2560px-Lambda_Cube_img.svg.png" width=30%></img>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Lambda_Cube_img.svg/960px-Lambda_Cube_img.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail" width=30%></img>
 
+
+<div class='fn'>Source : <a href="https://en.wikipedia.org/wiki/Lambda_cube">Wikipedia</a>.</div>
 
 Adding Inductive Types
 ===
@@ -69,7 +71,7 @@ Polymorphism
 **Polymorphism** in Lean is handled with the `Π` type formation operator, which
 quantifies over types, like `λ` quantifies over terms.
 
-For example,
+For example, here are a bunch of was to write the identity function.
 -/
 
 universe u
@@ -85,7 +87,7 @@ Notes:
 - `Π` and `∀` are defined as syntactic sugar for `forall`
 - `Π` requires Mathlib.
 - Regular function types are a special case of Π types.
-- The above functions are also **universe polymorphic**
+- Bonus! The above functions are also **universe polymorphic**
 -/
 
 /-
@@ -183,20 +185,27 @@ def chooseType : Bool → Type
 Sigma Types
 ===
 
-A Sigma type is
+In most type theories, A Sigma type is a fundamental object
 parameterized (by `α` and `β`), polymorphic (via the type of `β`),
-and dependent (via the constructor for `snd`). In Lean, Sigma is defined by
+and dependent (via the constructor for `snd`).
+
+In Lean, Sigma is defined by
 ```lean
 structure Sigma {α : Type u} (β : α → Type v) where
   fst : α
   snd : β fst
 ```
 For example, to carry around a length and a default vector of that
-length, we could do:
+length, we can use a variety of syntaxes:
 
 -/
-#check Sigma.mk 0 Vec.nil
-#check Sigma.mk 1 (Vec.nil.cons 0)
+
+example : Sigma (Vec Nat) := ⟨ 0, Vec.nil ⟩
+example : Σ n : ℕ, Vec Nat n := ⟨ 0, Vec.nil ⟩
+example : (n : ℕ) × Vec ℕ n := ⟨ 0, Vec.nil ⟩
+
+example : (Σ n : Nat, Vec Nat n) = ((n : Nat) × Vec Nat n) :=
+  rfl
 
 /-
 A Function on Sigma Types
@@ -210,7 +219,10 @@ def Vec.default (n : Nat) : Σ (n:Nat), Vec Nat n := match n with
   | n+1 => let v := (Vec.default n)
            Sigma.mk (v.fst+1) (v.snd.cons 0)
 
-#check Vec.default 3 --- (n : ℕ) × Vec ℕ n
+#reduce (types := true) Vec.default 3    -- ⟨3, Vec.cons 0
+                                         --    (Vec.cons 0
+                                         --      (Vec.cons 0
+                                         --        Vec.nil))⟩
 
 /-
 Exercises
@@ -225,29 +237,7 @@ and returns the vector turned into a list.
 
 -/
 
-
---hide
 /-
-Inductive Arguments
-===
-
-In the lambda calculus we encoded natural numbers using Church encodings.
-
-
-What if we wanted to do a proof by induction? We would have to do that
-*outside* the lambda calculus.
-
-In particular, we cannot express the inductive principle:
-
-```lean
-∀ (P : ℕ → Prop), P 0 → (∀ n, P n → P (n+1)) → ∀ n, P n
-```
-
-because we don't have a definition of ℕ as a type with an inductive
-principle that goes with it.
-
---unhide
-
 Inductive Types
 ===
 
@@ -272,7 +262,9 @@ The Recursor
 
 Declaring an inductive type extends the kernel with its full inductive schema:
 the type, constructors, and **recursor**, which is the inductive principle for
-that type. For example,
+that type.
+
+For example, once `Nat` is defined you get:
 -/
 
 #check Nat.rec   -- {motive : Nat → Sort u} →
@@ -282,6 +274,9 @@ that type. For example,
 
 /- You will recognize this as being the induction principle for the natural numbers. If `Sort u`
 were Prop, then `motive` would be a predicate on the natural numbers.
+
+No Confusion
+===
 
 You also get a way to show terms constructed differently are different. -/
 
@@ -336,34 +331,27 @@ Here, the motive is <tt>fun n => ∑ k ≤ n, k = n*(n+1)/2</tt>
 Non-recursive Inductive Types
 ===
 
-When a type isn't recursive, as in:
+When a type isn't recursive `.casesOn` instance is particularly simple:
 
 -/
 
-inductive ThreeVal where | one | two | three
+inductive Three where | one | two | three
 
-/-
-The `.casesOn` instance is particularly simple.
--/
+#check Three.casesOn
+  -- {motive : Three → Sort u} → ∀ t : Three,
+  -- motive one → motive two → motive three → motive t
 
-#check ThreeVal.casesOn
-  -- {motive : ThreeVal → Sort u} → ∀ t : ThreeVal,
-  -- motive ThreeVal.one → motive ThreeVal.two →
-  -- motive ThreeVal.three → motive t
+/- For example, a mapping from Three to Nat can be defined by: : -/
 
-/- For example: -/
+def Three.toNat (x : Three) : Nat :=
+  Three.casesOn x 1 2 3
 
-def ThreeVal.toNat (x : ThreeVal) : Nat :=
-  ThreeVal.casesOn x 1 2 3
+#eval Three.two.toNat     -- 2
 
-#eval ThreeVal.one.toNat     -- 1
+/- Or, making the motive explicit, -/
 
-/- We can explicitly state the motive using the `@` operator to make the implicit
-argument explicit: -/
-
-def ThreeVal.toNat' (x : ThreeVal) : Nat :=
-  @ThreeVal.casesOn (fun _ => Nat) x 1 2 3
-
+def Three.toNat' (x : Three) : Nat :=
+  @Three.casesOn (fun _ => Nat) x 1 2 3
 
 /-
 Recursive Definitions with the Recursor
@@ -379,8 +367,7 @@ def even (n : Nat) : Bool :=
 
 /- Lean internally compiles this to a recursor definition, we can see with `#print even`:
 ```lean
-def LeanW26.NonSimpleTypes.even : ℕ → Bool :=
-fun n ↦
+def LeanW26.NonSimpleTypes.even : ℕ → Bool := fun n ↦
   Nat.brecOn n fun n f ↦
     (match (motive := (n : ℕ) → Nat.below n → Bool) n with
       | Nat.zero => fun x ↦ true
@@ -394,7 +381,7 @@ Note that there is no recursive call here. In fact, we can write
 def even' (n : Nat) : Bool := Nat.recOn n true (fun _ ih => ¬ih)
 
 /-
-To define the same function.
+
 <div class='fn'>See <a href="https://leanprover.github.io/theorem_proving_in_lean/theorem_proving_in_lean.pdf">Theorem Proving in Lean</a>, Sec. 8.4.</div>
 
 -/

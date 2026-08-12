@@ -47,6 +47,8 @@ What is Happening?
     - Open problems (to avoid GPT looking up obscure papers)
     - Aletheia / Gemini 3 Deep Think architecture (no Lean)
 
+- **Collatz is False!**: [Link](https://leodemoura.github.io/blog/2026-8-1-postmortem-for-kernel-soundness-bug-14576/)
+
 <div class='fn'>
 <a href="https://openai.com/index/ten-advances-in-mathematics/">OpenAI 10 Problems</a>;
 <a href="https://x.com/alpoge/status/2079028340955197566">L. Alpöge</a>;
