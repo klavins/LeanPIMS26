@@ -14,6 +14,7 @@ set_option linter.flexible false
 
 namespace LeanW26
 
+--notdone
 
 /-
 Autoformalization
