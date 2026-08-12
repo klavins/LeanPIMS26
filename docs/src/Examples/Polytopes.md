@@ -12,9 +12,19 @@ One can represent polytopes in two ways:
 
 - As the bounded intersection of finitely many closed halfspaces. In this case, we refer to it as an **H-polytope**.
 
+<div style="display:flex; justify-content:center; align-items:center; gap:60px;">
+  <img src='img/VPolytope.png' class='img-down-left' width=40%></img>
+  <img src='img/HPolytope.png' class='img-down-right' width=30%></img>
+</div>
+
+Minkowski-Weyl Theorem
+===
+
 These two representations are equivalent due to the **Minkowski-Weyl Theorem**.
 
 This is an unfinished formalization project for the Minkowski-Weyl Theorem.
+
+In these slides we show to formaly define V-Polytopes, H-Polytopes, and Duality in Lean. We also formalize proofs of boundeness, closedness, and compactness results, and show how to state complex theorems in Lean.
 
 **Repository:** https://github.com/luzelenag123/EE598_Final_Project
 
@@ -63,7 +73,7 @@ Namespace
 The `carrier` is going to produce the underlying set associated to the `VPolytope` structure. 
 ```lean
 def carrier (P : VPolytope E) : Set E :=
-  convexHull ℝ (↑P.points : Set E)
+  convexHull ℝ (P.points : Set E)
 ```
 The `translate` map is going to produce a new `VPolytope` resulting from translating `P` by the vector `v`. 
 ```lean
@@ -83,11 +93,11 @@ theorem isCompact (P : VPolytope E) : IsCompact P.carrier := by
   simpa [carrier] using
     (P.points.finite_toSet).isCompact_convexHull
       (𝕜 := ℝ)
-      (s := (↑P.points : Set E))
+      (s := (P.points : Set E))
 
 theorem isConvex (P : VPolytope E) : Convex ℝ P.carrier := by
   simpa [VPolytope.carrier] using
-          (convex_convexHull ℝ (↑P.points : Set E))
+          (convex_convexHull ℝ (P.points : Set E))
 
 end VPolytope
 ```
@@ -95,6 +105,7 @@ end VPolytope
 Exercise
 ===
 Search Mathlib's `Compact.lean` file for theorems that help prove `isClosed` and `isBounded` in just one line.
+Write your solutions inside the `VPolytope` namespace.
 
 ```lean
 theorem isBounded (P : VPolytope E) : Bornology.IsBounded P.carrier := by
@@ -294,7 +305,69 @@ theorem separation_compact_closed
     ∃ (a : E) (b : ℝ),
       a ≠ 0 ∧
       C ⊆ {x | inner ℝ a x < b} ∧
-      D ⊆ {x | inner ℝ a x > b} := sorry
+      D ⊆ {x | inner ℝ a x > b} := by
+  --brief
+  obtain ⟨f, u, v, hCsep, huv, hDsep⟩ :=
+    geometric_hahn_banach_compact_closed hC_convex hC_compact hD_convex hD_closed hdisj
+  --
+  -- Convert the functional f into inner-product form:
+  -- f x = inner a x for some vector a (Riesz representation).
+  -- (Keep as sorry until exact lemma name is confirmed in your Mathlib version.)
+  obtain ⟨a, ha⟩ : ∃ a : E, ∀ x : E, f x = inner ℝ a x := by
+    -- The map toDualMap is surjective for complete spaces (EuclideanSpace is complete).
+    -- So there exists `a` such that `f = toDualMap ℝ (ℝn n) a`.
+    have hsurj : Function.Surjective (InnerProductSpace.toDualMap ℝ E) :=
+      LinearIsometryEquiv.surjective (InnerProductSpace.toDual ℝ E)
+    obtain ⟨a, rfl⟩ := hsurj f
+    use a
+    intro x
+    -- Now show: (toDualMap ℝ (ℝn n) a) x = inner ℝ a x
+    exact InnerProductSpace.toDualMap_apply_apply ℝ
+  --
+  -- Choose b as midpoint between u and v.
+  refine ⟨a, (u + v) / 2, ?_, ?_, ?_⟩
+  --
+  · -- Prove a ≠ 0.
+    intro ha0
+    -- Pick one point c in C and one point d in D.
+    rcases hC_nonempty with ⟨c, hc⟩
+    rcases hD_nonempty with ⟨d, hd⟩
+    -- If a=0, then f is identically 0 (via f x = inner a x).
+    have hfc : f c = 0 := by simpa [ha0] using ha c
+    have hfd : f d = 0 := by simpa [ha0] using ha d
+    -- From C-side strict inequality: f c < u, so 0 < u.
+    have h1 : 0 < u := by
+      have := hCsep c hc
+      simpa [hfc] using this
+    -- From D-side strict inequality: v < f d, so v < 0.
+    have h2 : v < 0 := by
+      have := hDsep d hd
+      simpa [hfd] using this
+    -- Contradiction with u < v.
+    linarith [huv, h1, h2]
+  --
+  · -- Show C ⊆ {x | inner a x < (u+v)/2}.
+    intro x hx
+    -- From Hahn–Banach: f x < u for x∈C.
+    have hx' : f x < u := hCsep x hx
+    -- Midpoint is strictly above u because u < v.
+    have hm : u < (u + v) / 2 := by linarith [huv]
+    -- Therefore f x < midpoint.
+    have : f x < (u + v) / 2 := lt_trans hx' hm
+    -- Rewrite f x as inner a x.
+    simpa [ha x] using this
+  --
+  · -- Show D ⊆ {x | inner a x > (u+v)/2}.
+    intro x hx
+    -- From Hahn–Banach: v < f x for x∈D.
+    have hx' : v < f x := hDsep x hx
+    -- Midpoint is strictly below v because u < v.
+    have hm : (u + v) / 2 < v := by linarith [huv]
+    -- Therefore midpoint < f x.
+    have : (u + v) / 2 < f x := lt_trans hm hx'
+    -- Rewrite f x as inner a x.
+    simpa [ha x] using this
+  --unbrief
 ```
 
 More main theorems
