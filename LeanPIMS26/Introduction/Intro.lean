@@ -43,7 +43,7 @@ What is Happening?
 
 - **Anthropic [Improves](https://github.com/anthropics/zeta-23-lean) Riemann: 41% to 67%** (Aug 2026)
 
-- **OpenAI Solves 10 Oustanding Problems** (Aug 2026)
+- **OpenAI Solves 10 Outstanding Problems** (Aug 2026)
     - 3 Erdös problems, first non-sofic group, ...
     - Circuit size for permanent : Ω(n³) (from 1985) → n⁴/log n, ...
     - OpenAI general-purpose reasoning model + [Lean certificates](https://github.com/openai/ten-proofs)
