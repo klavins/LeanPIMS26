@@ -29,9 +29,8 @@ Structures so far have mostly been a **carrier type** plus **operations on that 
 - `Poset α` has `le : α → α → Prop`
 - `Ring R`, `Lattice α`, `Field F`, ...
 
-Categories don't fit into this pattern! There are multiple types. This causes
-dependent typing woes, and universes make a return when we want to model
-certain categories.
+Categories don't fit into this pattern! There are multiple types, which causes
+dependent typing woes.
 
 Additionally, Mathlib's category theory definitions are different from the
 "straightforward" way to define math ideas seen in this course. We'll take a
@@ -98,7 +97,7 @@ universe u v
 --unhide
 
 /-
-Conventions
+Convention: Composition Order
 ===
 
 **Composition order.** `comp f g` means "`f`, then `g`": diagrammatic order,
@@ -107,14 +106,6 @@ following the arrows. Others write `g ∘ f` instead; "`g` after `f`".
 -/
 
 #check Category.comp -- self.Hom A B → self.Hom B C → self.Hom A C
-
-/-
-**Universe order.** Lean binds universes by default in order of first
-appearance in definitions, and `Obj : Type u` comes first, so you'd get
-`Category.{u, v}`. When you write `Category X`, Lean can read `u` straight off
-`X`, but nothing determines `v`. Putting `v` first lets you write `Category.{7}
-X` instead of `Category.{_, 7} X`.
--/
 
 /-
 Exercise: The Category of Types
@@ -224,7 +215,7 @@ slightly misleading hint!
 -/
 
 /-
-Universes have Returned
+`Prop` Is Not `Type`
 ===
 
 Writing
@@ -245,7 +236,7 @@ Making sense of the universe synonyms:
 ```
 
 `Hom` needs to return a `Type v`, which has sort `Type (v + 1)`. We're
-suppyling `A ≤ B`, of type `Prop`, which has sort `Type 0`. Lean can't solve `0
+supplying `A ≤ B`, of type `Prop`, which has sort `Type 0`. Lean can't solve `0
 = v + 1`.
 
 Plainly, we need a type, not a proposition, and `A ≤ B` is a proposition!
@@ -256,12 +247,15 @@ Plainly, we need a type, not a proposition, and `A ≤ B` is a proposition!
 PLift Saves the Day
 ===
 
-`PLift` has a one-field structure that puts the proof in a `Type`-flavored box.
+`PLift` is a one-field structure that puts the proof in a `Type`-flavored box.
 Constructor `PLift.up` and projection `PLift.down`:
 ```lean
     PLift.up   : α → PLift α
     PLift.down : PLift α → α
 ```
+(`ULift` is the same trick one level up: it boxes a `Type` instead of a `Prop`.
+We'll need it later.)
+
 We can now define `Hom A B := PLift (A ≤ B)`. Because `PLift (A ≤ B) : Type`
 the whole category has arrow universe `v := 0`.
 -/
@@ -509,166 +503,6 @@ isomorphisms.
 -/
 
 /-
-Topic Change: What Universe Is `Types` In?
-===
-
-We built `Types`, the category with `Type u` as objects and functions as
-arrows, earlier. What universe does it live in?
--/
-
-set_option pp.universes true in -- trick to show universes in next statement
-#check @Types.{u} -- Category.{u, u + 1}
-
-/-
-Arrows in `Type u`, objects in `Type (u + 1)`.
-
-The objects *are* the types with type `Type u`, and `Type u : Type (u + 1)`.
-The arrows are functions `A → B` with `A B : Type u`, and a function type lands
-in the `imax` of its two universes, so just `u`.
-
-So `Types` isn't one category, but a family of categories, one for each `u`.
--/
-
-/-
-Universe of `Category.{v, u}`
-===
-
-**Functions** land in the `imax` of their two universes (functions returning
-`Prop` are always `Prop`).
-
-**Structures** land in the `max` of their *fields'* universes, and are never in
-`Prop`. If it has a field `n : ℕ`, then its universe is at least `Type 0`
-because `ℕ : Type 0`. If it *stores* a type `obj : Type u`, then because `Type
-u : Type (u + 1)`, the structure's universe is at least `Type (u + 1)`.
-
-**Parameters and indices** don't directly count until they're used elsewhere in
-the definition. `Category` takes its objects as a parameter.
-
-Combining these together, `Category` stores three non-`Prop` fields:
-* `Hom : Obj → Obj → Type v`, which lands in `Type (max u (v + 1))` because
-`Obj : Type u` and `Type v : Type (v + 1)`.
-* `id : (A : Obj) → Hom A A`, which lands in `Type (max u v)` because `Obj :
-Type u` and `Hom _ _ : Type v`.
-* `comp {A B C : Obj} : Hom A B → Hom B C → Hom A C`, which lands in `Type (max
-u v)` because `Obj : Type u` and `Hom _ _ : Type v`.
--/
-
-set_option pp.universes true in
-#check Category -- Type (max u (v + 1))
-
-/-
-Exercise: Universe of `Functor`
-===
-
-<ex/> Take a moment to calculate the universe of `Functor` by hand:
-
-```lean
-structure Functor.{v₁, v₂, u₁, u₂} {X : Type u₁} {Y : Type u₂}
-    (C : Category.{v₁} X) (D : Category.{v₂} Y) where
-  obj : X → Y
-  map {A B : X} : C.Hom A B → D.Hom (obj A) (obj B)
-  map_id : ∀ (A : X), map (C.id A) = D.id (obj A)
-  map_comp : ∀ {A B E : X} (f : C.Hom A B) (g : C.Hom B E),
-               map (C.comp f g) = D.comp (map f) (map g)
-```
--/
-
-set_option pp.universes true in
-#check @Functor.{v₁, v₂, u₁, u₂} -- what comes out here?
-
-/-
-Moving Up in the Universe Hierarchy
-===
-
-Every type in `Type u` *ought* to be a type in `Type (u+1)`. There isn't an
-automatic coercion: Lean's universes are **non-cumulative***.
--/
-
-#check_failure (fun (α : Type 0) => (α : Type 1)) -- α can't be both Type 0 and Type 1
-
-/-
-Just like PLift saved us by lifting `Prop` to `Type 0`, so `ULift` lifts `Type
-s` to `Type (max s r)`, effectively allowing us to increase the universe level
-of anything:
--/
-
-#check ULift -- ULift.{r, s} (α : Type s) : Type (max s r)
-
-/-
-Back to category theory: this forms a functor from one `Types` to another!
--/
-
-def uliftFunctor : Functor Types.{u} Types.{max u v} where
-  obj X := ULift.{v} X
-  map f := fun x => ULift.up (f x.down)
-  map_id _ := rfl
-  map_comp _ _ := rfl
-
-/-
-\*Rocq, an alternative to Lean in some manners, has cumulative universes! So is
-a language design choice, not some dependent type theory snag.
--/
-
-/-
-The Category of Categories
-===
-
-Functors map between categories; they have identities and composition. Sounds like a category where the objects are categories and the arrows are functors!
-Because `Category` is parameterized by an object type, we **bundle** the object with `Category` to form a "category over an arbitrary object" type:
--/
-
-def Cats : Category (Σ X : Type u, Category.{v} X) where
-  Hom C D := Functor C.2 D.2
-  id C := Functor.id C.2
-  comp F G := Functor.comp F G
-  id_comp _ := rfl
-  comp_id _ := rfl
-  assoc _ _ _ := rfl
-
-set_option pp.universes true in
-#check Cats -- arrows are (max u v); objects are (max (u + 1) (v + 1))
-
-/-
-Arrows in `max u v`: a functor is no bigger than the categories it joins.
-
-Objects are in `max (u+1) (v+1)`: The `v + 1` comes from `Category.{v}`, and
-the `u + 1` comes from storing the `X : Type u`.
--/
-
-/-
-`Cats` Is Not One of Its Own Objects
-===
-
-`Cats.{u, v}` is a category. Is it one of the categories it's about?
-
-`Cats` **is** an object of **a different** `Cats` higher in the universe hierarchy:
-```lean
-example : Σ X : Type (max (u+1) (v+1)), Category.{max u v} X := ⟨_, Cats.{u,v}⟩
-```
-
-But it's not one of its own objects:
-```lean
-example : Σ X : Type u, Category.{v} X := ⟨_, Cats.{u,v}⟩
-```
--/
---hide
--- example : Σ X : Type u, Category.{v} X := ⟨_, Cats.{u,v}⟩
---unhide
-/-
-```
-Application type mismatch: The argument
-  Cats
-has type
-  Category.{max u v, max (max (v + 1) u) (u + 1)} ((X : Type u) × Category X)
-...
-but is expected to have type
-  Category.{v, u} ?m.4
-```
-
-Girard's paradox avoided!
--/
-
-/-
 What does Mathlib do?
 ===
 
@@ -707,37 +541,19 @@ class Quiver (V : Type u) where
   Hom : V → V → Type v
 ```
 
-Mathlib separates `Quiver` from `Category` because there are some definitions
-that use `Quiver` alone, and don't require the categorical structure.
-Separating out `Quiver` doesn't affect downstream `Category` use; it freely
-enables other definitions.
--/
-
-/-
-The Free Category on a Quiver
-===
-
-Take any quiver and build a category from it: same objects, and an arrow `A ⟶
-B` is a **path**: a finite chain of quiver edges from `A` to `B`. Identity is
-the empty path, composition is concatenation.
+Mathlib splits `Quiver` off because some definitions need only the objects and
+arrows. The **free category** on a quiver is one: same objects, and an arrow `A
+⟶ B` is a **path**, a finite chain of quiver edges. Identity is the empty
+path, composition is concatenation.
 
 ```lean
-variable [Quiver V] -- assume a quiver on `V` is in scope
-
 def Paths (V : Type u₁) : Type u₁ := V -- a type synonym; we'll see this later
 
-instance : Category.{max u₁ v₁} (Paths V) where
+instance [Quiver V] : Category (Paths V) where
   Hom := fun X Y : V => Quiver.Path X Y
   id _ := Quiver.Path.nil
   comp f g := Quiver.Path.comp f g
   -- hmm... why didn't Mathlib prove the identity and association laws?
-```
-
-Adjoint functors arise:
-```lean
-def forget : Cat.{v, u} ⥤ Quiv.{v, u}
-def free   : Quiv.{v, u} ⥤ Cat.{max u v, u}
-def adj    : Cat.free ⊣ Quiv.forget
 ```
 
 Similarly, `CategoryStruct` broadens definitions that don't depend on the
