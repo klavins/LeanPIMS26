@@ -72,7 +72,7 @@ whose objects line up.
 -/
 
 /-
-The Definition in Lean
+A Definition in Lean
 ===
 
 The type of objects is a *parameter*. The arrows are a field, indexed by pairs of
@@ -108,7 +108,7 @@ following the arrows. Others write `g ∘ f` instead; "`g` after `f`".
 #check Category.comp -- self.Hom A B → self.Hom B C → self.Hom A C
 
 /-
-Exercise: The Category of Types
+The Category of Types
 ===
 
 Lean itself forms a category!
@@ -189,11 +189,6 @@ instance {A : Type u} (C : Category A) [Unique A] : Temp.Monoid (C.Hom default d
 
 /-
 In fact, given *any* `X : A`, the arrows `C.Hom X X` form a monoid!
-
-The "bijection" is not really an `Equiv` because the unique object type is
-dropped in the `Monoid`. Possible patches to get true bijection: `Monoid` is
-equivalent to the categories over `Unit`, or single-object categories are
-equivalent to `Monoid`s bundled with some unique type.
 -/
 
 /-
@@ -208,10 +203,19 @@ arrows using the preorder's comparator: one arrow `Hom A B` iff `A ≤ B`.
 Mathlib's `Preorder` is the `Poset` of the Relations deck minus antisymmetry: `≤` is
 reflexive (`le_refl`) and transitive (`le_trans`), but two elements can each be below the
 other without being equal.
+-/
 
+example (X : Type u) [Preorder X] : Category X where
+  Hom A B := sorry -- fill me in first
+  id := sorry
+  comp := sorry
+  id_comp := sorry
+  comp_id := sorry
+  assoc := sorry
+
+/-
 If you get an error about mismatched types, you've successfully followed the
 slightly misleading hint!
-
 -/
 
 /-
@@ -320,7 +324,7 @@ def Functor.comp {X : Type u₁} {Y : Type u₂} {Z : Type u₃}
   map_comp f g := by rw [F.map_comp, G.map_comp]
 
 /-
-Exercise: Functors You Already Have
+Exercise: Functors Generalize Homomorphisms
 ===
 
 <ex/> A monoid homomorphism is a functor between the corresponding
@@ -339,20 +343,18 @@ def OfMonoidHom {M N : Type u} [Temp.Monoid M] [Temp.Monoid N]
     map_comp := sorry
     --unhide
 
-/-
-<ex/> A monotone map is exactly a functor between the corresponding preorder
-categories. Build that one too (`Monotone f` unfolds to `a ≤ b → f a ≤ f b`).
--/
-
+--hide
+-- Not in the slides: something to try if you finish the above problem
+-- with time to spare. Turn a monotone map into a functor between the
+-- corresponding preorder categories (`Monotone f` unfolds to `a ≤ b → f a ≤ f b`).
 def OfMonotone {X Y : Type u} [Preorder X] [Preorder Y]
     (f : X → Y) (hf : Monotone f) :
   Functor (OfPreorder X) (OfPreorder Y) where
-    --hide
     obj := sorry
     map hAB := sorry
     map_id := sorry
     map_comp := sorry
-    --unhide
+--unhide
 
 /-
 When Are Two Functors Equal?
@@ -485,21 +487,6 @@ Two functors are **isomorphic** whenever there exist natural transformations
 * `ε` composed with `η` is the identity natural transformation.
 
 Hence two functors `C ⥤ D` with provably different object maps can be isomorphic!
--/
-
-/-
-The Lessons from Functors
-===
-When dealing with dependent types, Lean can get in the way of stating the
-properties we think we want.
-
-Transport `▸` can help us state valid math, but it can lead to *dependent type
-theory hell*; defining tools like `eqToHom` helps you sweep transport under the
-rug.
-
-The best option, if it's available, is to avoid transport altogether and seek
-an alternative, domain-specific version of equality like `Functor`'s
-isomorphisms.
 -/
 
 /-
@@ -673,33 +660,26 @@ fast.
 Why `:= by cat_disch`?
 ===
 
-Look again at the law fields in Mathlib's `Category`: they end in `:= by
-cat_disch`. A `:= by tac` in a *field* position is an **auto-param**: omit the
-field when you build the structure and Lean runs `tac` to produce it. Our three
-laws had to be proved by hand in every example, usually by `rfl`. Mathlib has
-seen the pattern, and developed `cat_disch` to dispatch "easy" category theory
-goals.
+The law fields in Mathlib's `Category` end in `:= by cat_disch`. A `:= by tac`
+in a field position is an **auto-param**: omit the field when you build the
+structure and Lean runs `tac` to produce it, complaining if the tactic doesn't
+close the goal.
 
-`cat_disch` is used everywhere in the category theory section of Mathlib. It
-uses a version of `aesop` with specifically registered rules; it also has a
-`grind` mode.
+Our three laws had to be proved by hand in every example, usually by `rfl`.
+`cat_disch` is `aesop` with category theory rules registered, and it dispatches
+those goals for you throughout Mathlib's `CategoryTheory`.
 
-The size of Mathlib justifies the presence of such a tactic. If fields are
-renamed, or their contents are changed such that their proofs are still easy,
-then `cat_disch` keeps the proofs checking without any source code changes.
+At Mathlib's scale a custom tactic is worth it: rename a field, and as long as
+its proof stays closeable via `cat_disch`, everything keeps checking with no
+source changes.
 -/
 
 /-
 Where the Category Theory Goes
 ===
 
-We didn't get to much category theory. The rest, and where it lives in Mathlib:
-
-- **Natural transformations**, `CategoryTheory/NatTrans.lean`. The honest answer to
-  "when are two functors the same," which we left open.
-- **Limits and colimits**, `CategoryTheory/Limits/`. Products, equalizers, pullbacks.
-- **Adjunctions**, `CategoryTheory/Adjunction/`. We stated one and did not unpack it.
-- **Yoneda**, `CategoryTheory/Yoneda.lean`.
+We only defined a sliver of category theory. There is *much* more of it in
+Mathlib's `CategoryTheory`.
 
 My own interests in category theory are in string diagrams for monoidal
 categories: the topology of *twisted involutive* monoidal categories represents
