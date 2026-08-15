@@ -157,7 +157,7 @@ A Monoid Is a One-Object Category
 Use `Unit`, with its only member `() : Unit`:
 -/
 
-def OfMonoid (M : Type v) [Temp.Monoid M] : Category.{v} Unit where
+def OfMonoid (M : Type v) [Temp.Monoid M] : Category Unit where
   Hom _ _ := M -- the arrows are the monoid elements
   id _ := Temp.Monoid.one
   comp f g := Temp.Monoid.mul f g
@@ -264,7 +264,7 @@ We can now define `Hom A B := PLift (A ≤ B)`. Because `PLift (A ≤ B) : Type`
 the whole category has arrow universe `v := 0`.
 -/
 
-def OfPreorder (X : Type u) [Preorder X] : Category.{0} X where
+def OfPreorder (X : Type u) [Preorder X] : Category X where
   Hom A B := PLift (A ≤ B)
   id A := ⟨le_refl A⟩
   comp f g := ⟨le_trans f.down g.down⟩
@@ -282,7 +282,7 @@ Functors
 
 Categories have structure, so there should be structure-preserving maps between them.
 A **functor** `F : Functor C D` sends objects to objects and arrows to arrows: it takes
-an arrow `Hom A B` to an arrow `Hom (F A) (F B)`, and preserves identities and
+an arrow `Hom A B` to an arrow `Hom (F.obj A) (F.obj B)`, and preserves identities and
 composition. Mathlib writes this type using `⥤` (like many things in Mathlib,
 you can type the symbol using `\functor`).
 
@@ -336,12 +336,10 @@ def OfMonoidHom {M N : Type u} [Temp.Monoid M] [Temp.Monoid N]
     (h_one : f Temp.Monoid.one = Temp.Monoid.one)
     (h_mul : ∀ a b, f (Temp.Monoid.mul a b) = Temp.Monoid.mul (f a) (f b)) :
   Functor (OfMonoid M) (OfMonoid N) where
-    --hide
     obj := sorry
     map := sorry
     map_id := sorry
     map_comp := sorry
-    --unhide
 
 --hide
 -- Not in the slides: something to try if you finish the above problem
@@ -540,7 +538,7 @@ instance [Quiver V] : Category (Paths V) where
   Hom := fun X Y : V => Quiver.Path X Y
   id _ := Quiver.Path.nil
   comp f g := Quiver.Path.comp f g
-  -- hmm... why didn't Mathlib prove the identity and association laws?
+  -- hmm... why didn't Mathlib prove the identity and associativity laws?
 ```
 
 Similarly, `CategoryStruct` broadens definitions that don't depend on the
@@ -703,7 +701,7 @@ replaces it.
 
 **A type gets one findable instance per class.** The go-to escape hatch is a
 type synonym or one-field definition, and it costs you every other instance on
-that type. That is what `Paths`, `Cᵒᵖ`, and many others are.
+that type. That is what `Paths`, dual categories, and many others are.
 
 **Read Mathlib code, even if you don't use it.** The maintainers have made
 mistakes, fought battles, and documented their journeys. Take the free
