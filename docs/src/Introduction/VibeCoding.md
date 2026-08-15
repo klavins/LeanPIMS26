@@ -98,7 +98,6 @@ I entered the prompt:
 
 > Create the file LeanPIMS26/Introduction/cc-demo.lean. In that file, implement mergesort, proving it terminates. Run #eval on a few examples of different types of lists. Then prove that mergesort always results in a sorted list. Put this result in a theorem. The proofs to any theorems should be less than 20 lines long, so you may need to define lemmas that work out intermediate results. Do not use all of mathlib, just what you need from lists and tactics. Iterate on the file using the LSP until there are no errors remaining. Do not add comments.
 
-
 I waited for 7m, 14s and got 99 lines of code with the ultimate theorem:
 
 ```lean
@@ -150,6 +149,59 @@ inductive Sorted {α : Type*} [LE α] : List α → Prop where
   | cons {a b : α} {l : List α} : a ≤ b → Sorted (b :: l) → Sorted (a :: b :: l)
 ```
 
+Demo 3 : Plan Mode
+===
+
+I entered the prompt:
+
+> Consider the quotient topology on two copies of ℝ in which all _but_ the zeros are identified with their corresponding elements. Instiante this space using Mathlib's TopologicalSpace and show that the resulting space is not Hausdorff. Before jumping it, go into plan mode to make sure that you have all the steps needed to be successful. Then present me with the plan. When we are ready to write the code, put it in LeanPIMS26/Sandbox/TwoCopies.lean.
+
+Then I asked it to implement the plan in **auto** mode.
+
+Refinements
+===
+
+Then I looked at the file and asked:
+
+> Do a complete review on the resulting file, and code-golf the whole thing. Make sure no proofs are overly long (roughly 10 lines max) and break out lemmas and simps if necessary. Finally, take out all the comments. This is not intended to be used as course notes.
+
+It responded:
+1. The mathematical content is really just "ℝ has no isolated points," which Mathlib expresses as the punctured neighborhood filter `𝓝[≠] 0` being `NeBot`. I extracted that as a 3-line helper.
+2. `o₁_ne_o₂` stays a one-liner but now dispatches the extra Or branch of the new relation with `Sum.inl_ne_inr`.
+
+
+Demo 4: A Substantial Request
+===
+
+
+>  Now come up with a plan to show that the fundamental group of `TwoOrigins` is the integers under addition.
+
+It thought for 10 minutes, looked into what it could use from Mathlib, and gave me a four phase plan:
+
+1.  Mathlib does not have `π₁(S¹) ≅ ℤ`, and has no Seifert–van Kampen. But Junyan Xu's 2025 covering-space development provides the complete abstract theorem we need.
+
+2.  So the entire project reduces to: build the `ℤ-cover E → TwoOrigins`, check the four structure fields, and prove `SimplyConnectedSpace E`. The last item is the only mathematically hard part.
+
+3. Plan
+    a.  Phase 1 — Cover.lean: E, the action, p (300–500 lines)
+    b.  covering structure (200–400 lines, same file)
+    c. SimplyConnectedSpace E (the hard core, 800–2000 lines)
+    d. Phase 4 — assembly (50 lines, `TwoOriginsPi1.lean`)
+
+Result
+===
+
+1366 lines across four Sandbox files.
+
+Builds `ZigZag`, the universal cover: countably many real lines glued into an infinite zigzag (`ℝ × ℤ` quotiented by gluing line `n` to line `n+1` along alternating half-lines), with `ℤ` acting by shifting two lines.
+
+Shows `IsAddQuotientCoveringMap p ℤ`.
+
+Shows `SimplyConnectedSpace ZigZag`.
+
+Mathlib's IsAddQuotientCoveringMap.fundamentalGroupEquiv (quotient covering + simply connected total space ⟹ π₁(base) ≅ deck group) plus removing the ᵐᵒᵖ.
+
+The plan's reconnaissance confirmed Mathlib still has no π₁(S¹) ≅ ℤ — yet with the same two 2025 theorems it now follows in about three lines from AddCircle.isAddQuotientCoveringMap_coe (ℝ is simply connected). That's either a nice student project or a small Mathlib PR!
 
 
 Exercises
@@ -170,10 +222,13 @@ end LeanW26
 License
 ===
 
-Copyright (C) 2025  Eric Klavins
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.   
+(at your option) any later version.  
+
+Please see the full license at
+<a href="https://github.com/klavins/LeanPIMS26">
+https://github.com/klavins/LeanPIMS26
+</a>
 

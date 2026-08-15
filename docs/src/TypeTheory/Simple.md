@@ -21,6 +21,28 @@ In Lean the base type is called `Type`.
  Arrow `→` associates to the right. So the second expression
 above is equivalent to `Type → Type → Type`. 
 
+Universes
+===
+
+Lean, and most Type Theories, define a hierarchy of universes
+
+    - Sort 0 = Prop
+    - Sort 1 = Type 0 = Type
+    - Sort 2 = Type 1
+    ...
+
+All types have types:
+
+    - Prop : Sort 1          (read: Prop "has type" Sort 1)
+    - Type u : Type u+1
+    - Type → Type : Type 1
+    - Type 1 → Type 2 : Type 3
+
+Lean gives the _arrow type_ `Type → Type` a type in the universe
+one higher than the maximum of the types from which it was composed.
+
+See the **Universes** slide deck for more information.
+
 Type Variables
 ===
 
@@ -65,7 +87,7 @@ variable (f : A → A)           -- declare a function f from A into A
 #check x          -- A
 #check f          -- A → A
 ```
-  Here. `x` is a simple object with type `A`, while `f` is an function type from `A` into `A`.
+  Here `x` is a simple object with type `A`, while `f` is an function type in `A → A`.
 
 
 Terms : Applications
@@ -114,9 +136,9 @@ To give your functions names and use `def`.
 def inc₁ (x : Nat) : Nat := x + 1
 def inc₂ := fun (x : Nat) => x + 1
 
-#eval inc₁ 3
-#eval inc₂ 3
-#eval (fun (x : Nat) => x + 1) 3
+#eval inc₁ 3                           -- 4
+#eval inc₂ 3                           -- 4
+#eval (fun (x : Nat) => x + 1) 3       -- 4
 ```
 
 Currying
@@ -235,7 +257,8 @@ In the literature, this written:
 { x : A, f : A → A }  ⊢  h₁ x : A
 ```
 
-which reads: "If x has type A and f has type A → A, then we can derive f x has type A". 
+which reads: "If `x` has type `A` and `f` has type `A → A`,
+then we can derive `f x` has type `A`". 
 ```lean
 --hide
 end
@@ -285,8 +308,7 @@ But since `M` is operating on itself, `M` has to be of type τ:
 M : τ
 ```
 So `M `has two different types, which is not possible. Lean is not able to find
-a type for `x`. The placeholder symbol `_` is used by Lean as a way to ask the type
-checker to infer a type.
+a type for `x`.
 
 
 ```lean
@@ -354,6 +376,7 @@ You can have Lean do this for you using the `#reduce` directive.
 
 
 
+
 ```lean
 variable (x : A)
 
@@ -386,6 +409,11 @@ sub-expressions in, you always end up with the same term.
 - **Strong Normalization** β-reduction eventually stops at an irreducible term.
 This is a very strong statement. In most programming languages,
 you can write infinite loops. But not in the simply typed lambda calculus!
+
+<div class='fn'>While the calculus of constructions
+on which Lean is based is strongly normalizing,
+Lean itself adds definitional proof irrelevance, which breaks strong normalization.
+See the slide deck on `Equality`.</div>
 
 
 
@@ -452,11 +480,11 @@ instead of `f` and `x`.
 
 This is a lot of work, so let's let Lean do this for us: 
 ```lean
-#reduce (types := true ) succ c₀
-#reduce (types := true ) succ c₃
+#reduce (types := true ) succ c₀         -- c₁
+#reduce (types := true ) succ c₃         -- c₄
 ```
 
-Addition and Multiplication
+More Operations
 ===
 
 We can also add two numbers together: 
@@ -472,11 +500,7 @@ def mul :=  fun (m n : N) f x => m (n f) x
 
 #reduce (types := true) mul c₃ c₂
 ```
-
-Booleans and If Statements
-===
-
-We can encode an if-statement: 
+ We can encode an if-statement: 
 ```lean
 def ifzero := fun (m n p: N) => fun f x =>
               n (fun ( y : _ ) => p f x) (m f x)
@@ -498,7 +522,7 @@ considered **definitionally equal**.
 
 Arithmetic with the Simply Typed λ-Calculus illustrates its power. In fact,
 we'll show it can represent a fragment of logic called _intuitionist propositional
-logic`. And, clearly, you can do arithmetic.
+logic_. And, clearly, you can do arithmetic.
 
 However:
 - It does not have quantification (e.g. Π types)
@@ -545,10 +569,6 @@ example (p : Prop) : p → p :=
 
 example (p q : Prop) : p → (p → q) → q :=
   fun hp => fun hpq => hpq hp
-
-
-
---hide
 ```
 
 Looking Ahead: The Curry Howard Isomorphism
@@ -593,9 +613,6 @@ large set of all of mathematics, and presumably knowledge in general.
 We'll learn how to take advantage of the Curry-Howard correspondence soon.
 
  
-```lean
---unhide
-```
 
 Exercises
 ===
@@ -627,10 +644,13 @@ end LeanW26.Simple
 License
 ===
 
-Copyright (C) 2025  Eric Klavins
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.   
+(at your option) any later version.  
+
+Please see the full license at
+<a href="https://github.com/klavins/LeanPIMS26">
+https://github.com/klavins/LeanPIMS26
+</a>
 

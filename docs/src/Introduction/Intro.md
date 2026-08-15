@@ -30,7 +30,9 @@ AI companies doing math
 What is Happening?
 ===
 
-- **OpenAI Solves 10 Oustanding Problems** (Aug 2026)
+- **Anthropic [Improves](https://github.com/anthropics/zeta-23-lean) Riemann: 41% to 67%** (Aug 2026)
+
+- **OpenAI Solves 10 Outstanding Problems** (Aug 2026)
     - 3 Erdös problems, first non-sofic group, ...
     - Circuit size for permanent : Ω(n³) (from 1985) → n⁴/log n, ...
     - OpenAI general-purpose reasoning model + [Lean certificates](https://github.com/openai/ten-proofs)
@@ -44,6 +46,8 @@ What is Happening?
 - **The First Proof challenge** (early 2026)
     - Open problems (to avoid GPT looking up obscure papers)
     - Aletheia / Gemini 3 Deep Think architecture (no Lean)
+
+- **Collatz is False!**: [Link](https://leodemoura.github.io/blog/2026-8-1-postmortem-for-kernel-soundness-bug-14576/)
 
 <div class='fn'>
 <a href="https://openai.com/index/ten-advances-in-mathematics/">OpenAI 10 Problems</a>;
@@ -59,14 +63,17 @@ Moral and Ethical Issues
 - Leiden Declaration on Artificial Intelligence and Mathematics. [[link]](https://leidendeclaration.ai/)
     - "... draw extensively on the published mathematical commons...""
     - Access to models is expensive and therefore not uniform
+    - But: [Tim Gowers](https://gowers.wordpress.com/2026/07/26/thoughts-about-the-leiden-declaration/)
+
+- Jacob Tsimerman [interview](https://www.youtube.com/watch?v=6uIJdXmB4vE)
+    - "we won't just fall _naturally_ into a good equilibrium"
 
 - Jun–Yong Park, Automation Without Understanding:
 Why the United States must preserve mathematical capacity in the age of AI. [[link]](https://arxiv.org/pdf/2607.06377)
     - "Mathematical capacity is not a stockpile of theorems. It is a community of people ..."
 
 - Terrance Tao, Mathematics in the Age of AI [[link]](https://www.youtube.com/watch?v=sxAe4HJceFQ)
-    - Why do we do mathematics?
-    - "We will transition from an era of **proof scarcity** to **proof abundance**."
+    - "transition from an era of **proof scarcity** to **proof abundance**."
 
 - Will AI ever be able to conjecture?
 
@@ -232,10 +239,13 @@ end LeanW26
 License
 ===
 
-Copyright (C) 2025  Eric Klavins
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.   
+(at your option) any later version.  
+
+Please see the full license at
+<a href="https://github.com/klavins/LeanPIMS26">
+https://github.com/klavins/LeanPIMS26
+</a>
 
