@@ -1,0 +1,39 @@
+[0]
+line 3, column 0: failed to construct `T.ctorIdx` for `Nat`:
+  Unknown constant `Nat.casesOn`
+
+[1]
+line 8, column 2: Unknown constant `PProd.mk`
+
+[2]
+line 14, column 9: invalid atom
+
+[3]
+line 15, column 9: invalid atom
+
+[4]
+line 16, column 0: Unknown constant `Lean.TrailingParserDescr`
+
+[5]
+line 16, column 0: invalid syntax node kind `«term_+_»`
+
+[6]
+line 11, column 4: Unknown constant `Nat.add`
+
+[7]
+line 12, column 4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'one', which is 'noncomputable'
+
+[8]
+line 21, column 0: Unknown constant `Lean.TrailingParserDescr`
+
+[9]
+line 21, column 0: invalid syntax node kind `«term_=_»`
+
+[10]
+line 21, column 0: Unknown constant `Lean.PrettyPrinter.Unexpander`
+
+[11]
+line 23, column 24: unexpected token '+'; expected ':=', 'where' or '|'
+
+[12]
+line 23, column 23: Unknown constant `OfNat`

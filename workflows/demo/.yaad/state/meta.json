@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "blocks": {
+    "Problem": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/Problem/output.txt"
+      },
+      "state": {}
+    },
+    "problem": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/problem/output.txt"
+      },
+      "state": {}
+    },
+    "problem_2": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/problem_2/output.txt"
+      },
+      "state": {}
+    },
+    "problem_3": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/problem_3/output.txt"
+      },
+      "state": {}
+    },
+    "Student": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "response": "values/Student/response.lean"
+      },
+      "state": {
+        "calls": 1,
+        "log_count": 1
+      }
+    }
+  }
+}

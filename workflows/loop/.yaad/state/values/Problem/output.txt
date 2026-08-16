@@ -1,0 +1,3 @@
+Using only raw Lean 4, with the initial keyword prelude at the beginning of your code, define the natural numbers, addition on the natural numbers, and prove that addition is commutative. 
+
+Output only LEAN4 code. No comments. No thought processes. No backtics and fences. 

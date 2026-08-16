@@ -1,0 +1,23 @@
+prelude
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+def add : Nat → Nat → Nat
+  | m, Nat.zero => m
+  | m, Nat.succ n => Nat.succ (add m n)
+
+def one : Nat := Nat.succ Nat.zero
+def two : Nat := Nat.succ one
+
+notation "1" => one
+notation "2" => two
+infixl:65 "+" => add
+
+inductive Eq {α : Type} (a : α) : α → Prop where
+  | refl : Eq a a
+
+infix:50 "=" => Eq
+
+theorem one_plus_one : 1 + 1 = 2 := Eq.refl

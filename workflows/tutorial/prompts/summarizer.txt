@@ -1,0 +1,18 @@
+A student attempted to formalize a mathematics problem in Lean4. They were instructed to only produce Lean4 code. No comments. No thought process. Below is their code and the errors it produced.
+
+Provide an explanation of what they are doing wrong and include ONLY the exact error messages relevant to your explanation. Your goal is to help the student get it right the next time.
+
+If there are no errors listed, just respond with "Nice Job!".
+
+= START PROBLEM
+{problem}
+= END PROBLEM
+
+= START CODE (use the next line as line 1 when interpreting errors)
+{code}
+= END CODE
+
+= ERRORS
+{errors}
+= END ERRORS
+

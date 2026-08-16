@@ -1,0 +1,40 @@
+prelude
+
+universe u v
+
+inductive Unit : Type where
+  | unit : Unit
+
+inductive PUnit : Sort u where
+  | unit : PUnit
+
+inductive PProd (α : Sort u) (β : Sort u) : Sort (max u v) where
+  | mk : α → β → PProd α β
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+inductive Eq {α : Sort u} (a : α) : α → Prop where
+  | refl : Eq a a
+
+def add (n m : Nat) : Nat :=
+  Nat.rec n (fun _ r => Nat.succ r) m
+
+theorem congrArg {α : Sort u} {β : Sort v} (f : α → β) {a b : α} (h : Eq a b) : Eq (f a) (f b) :=
+  Eq.rec (motive := fun x _ => Eq (f a) (f x)) Eq.refl h
+
+theorem eq_trans {α : Sort u} {a b c : α} (h1 : Eq a b) (h2 : Eq b c) : Eq a c :=
+  Eq.rec (motive := fun x _ => Eq a x) h1 h2
+
+theorem eq_symm {α : Sort u} {a b : α} (h : Eq a b) : Eq b a :=
+  Eq.rec (motive := fun x _ => Eq x a) Eq.refl h
+
+theorem zero_add (n : Nat) : Eq (add Nat.zero n) n :=
+  Nat.rec Eq.refl (fun _ ih => congrArg Nat.succ ih) n
+
+theorem succ_add (n m : Nat) : Eq (add (Nat.succ n) m) (Nat.succ (add n m)) :=
+  Nat.rec Eq.refl (fun _ ih => congrArg Nat.succ ih) m
+
+theorem add_comm (n m : Nat) : Eq (add n m) (add m n) :=
+  Nat.rec (eq_symm (zero_add n)) (fun m' ih => eq_trans (congrArg Nat.succ ih) (eq_symm (succ_add m' n))) m
