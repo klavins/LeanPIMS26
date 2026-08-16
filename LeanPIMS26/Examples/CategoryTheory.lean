@@ -571,7 +571,7 @@ Ours takes the category as an argument, so we have to name it and pass it around
 
 -/
 
-example (X : Type u) (C : LeanW26.CategoryTheory.Category.{v} X) (A B E : X)
+example (X : Type u) (C : LeanW26.CategoryTheory.Category X) (A B E : X)
     (f : C.Hom A B) (g : C.Hom B E) : C.Hom A E := C.comp f g
 
 /-
