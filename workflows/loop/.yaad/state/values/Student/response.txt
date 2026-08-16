@@ -1,0 +1,39 @@
+prelude
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+inductive Eq {α : Type} (a : α) : α → Type where
+  | refl : Eq a a
+
+infix:50 " = " => Eq
+
+def add : Nat → Nat → Nat
+  | n, Nat.zero => n
+  | n, Nat.succ m => Nat.succ (add n m)
+
+theorem congrArg {α β : Type} (f : α → β) {a b : α} (h : a = b) : f a = f b :=
+  match h with
+  | Eq.refl => Eq.refl
+
+theorem zero_add (n : Nat) : add Nat.zero n = n :=
+  match n with
+  | Nat.zero => Eq.refl
+  | Nat.succ n' => congrArg Nat.succ (zero_add n')
+
+theorem succ_add (n m : Nat) : add (Nat.succ n) m = Nat.succ (add n m) :=
+  match m with
+  | Nat.zero => Eq.refl
+  | Nat.succ m' => congrArg Nat.succ (succ_add n m')
+
+theorem add_comm (n m : Nat) : add n m = add m n :=
+  match m with
+  | Nat.zero =>
+    match zero_add n with
+    | Eq.refl => Eq.refl
+  | Nat.succ m' =>
+    match add_comm n m' with
+    | Eq.refl =>
+      match succ_add m' n with
+      | Eq.refl => Eq.refl

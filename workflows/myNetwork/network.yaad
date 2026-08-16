@@ -1,0 +1,36 @@
+name: myNetwork
+about: What this network is for.
+
+blocks:
+  Problem:
+    type: Formatter
+    template: !file prompts/problem.txt
+
+  Student:
+    type: Gemini
+    extension: .lean
+    model: gemini-3.6-flash
+
+  Grader:
+    type: Lean
+
+  ok:
+    type: Formatter
+    template: "{errors}{sorries}"
+
+  Untitled 0:
+    type: Stop
+
+wires:
+  - Problem.output -> Student.body
+  - Student.response -> Grader.code
+  - Grader.errors  -> ok.errors
+  - Grader.sorries -> ok.sorries
+  - ok.output      -> Untitled 0.value
+
+layout:
+  Problem: {at: [97.5, 307.5]}
+  Student: {at: [195, 292.5]}
+  Grader: {at: [315, 292.5]}
+  ok: {at: [427.5, 292.5]}
+  Untitled 0: {at: [532.5, 292.5]}

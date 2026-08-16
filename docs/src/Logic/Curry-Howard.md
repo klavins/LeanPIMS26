@@ -65,11 +65,11 @@ Curry-Howard: Propositions → Types
 ===
 
 The opposite direction of the CHI is more technical. We have to show how to produce a
-λ-calculus term M from aproof of `φ` so that `M : φ`. For example, suppose we started
+λ-calculus term M from a proof of `φ` so that `M : φ`. For example, suppose we started
 with the propositional proof tree in the previous section. How would we produce the
-type derivation from it? Here we will outline how this is done in general.
+type derivation from it?
 
-First we need a way to produce a type context from a propositional context. Suppose that
+First we produce a type context from a propositional context. Suppose that
 ```
 Γ = { φ₁, φ₂, ..., φₙ }
 ```
@@ -106,7 +106,7 @@ Once again by the VAR rule
 ```
 
 Why do we need two sub-cases? It's because of how we defined `Δ` on the previous
-as related to `Γ` and not to `Γ ∪ { x : φ }`)
+slide as related to `Γ` and not to `Γ ∪ { x : φ }`.
 
 Proof : Case 2
 ===
@@ -133,7 +133,7 @@ By the ABST rule, we can conclude
 Proof : Case 3
 ===
 
-**Case:**: The proof ends with →Intro
+**Case:** The proof ends with →Intro
 
 Suppose the proposition `φ` has the form the `ρ → ψ` and the proof `Γ ⊢ ρ → ψ` ends with
 ```
@@ -182,7 +182,7 @@ showing the proposition considered as a type is occupied.
 def my_theorem : A → A :=
   fun proof_of_A : A => proof_of_A
 ```
- We have called the bound variable in the lambda expression `proof`, but you could call the bound
+ We have called the bound variable in the lambda expression `proof_of_A`, but you could call the bound
 variable anything you like. A common scheme is to refer to a proof of `x` by `hx`. 
 ```lean
 def my_theorem' : A → A :=
@@ -196,7 +196,7 @@ Lean provides the keyword `theorem` for definitions intended to be results, whic
 but requires the type of the function being defined to be `Prop`.
 
 As another example, we prove the other proposition we encountered above.
-Here we call the bound variables pca for "proof of c → a" and pc for "proof of c".  
+Here we call the bound variables `hca` for "proof of c → a" and `hc` for "proof of c".  
 ```lean
 theorem another_theorem : (C → A) → C → A :=
   fun hca : C → A =>
@@ -207,7 +207,7 @@ theorem another_theorem : (C → A) → C → A :=
 how `my_theorem` acts as a function from proofs to proofs. 
 ```lean
 theorem another_theorem_v2 : (C → A) → C → A :=
-  fun h : C → A => my_theorem h
+  my_theorem
 ```
 
 Another Example
@@ -216,17 +216,17 @@ Another Example
 ```lean
 theorem t1 : A → C → A :=
   fun ha : A =>
-  fun hc : C =>                                -- Notice that hc is not used
+  fun hc : C =>                           -- Notice that hc is not used
   ha
 
 theorem t2 : A → C → A :=
-  fun ha hc  => ha                             -- We can use fun with two arguments
+  fun ha hc  => ha                        -- We can use fun with two arguments
 
 theorem t3 : A → C → A :=
-  fun ha _ => ha                               -- We can tell Lean we know hc is not used
+  fun ha _ => ha                          -- We can tell Lean we know hc is not used
 
-example : A → C → A :=                         -- We can state and prove an unnamed theorem
-  fun ha _ => ha                               -- using the `example` keyword
+example : A → C → A :=                    -- We can state and prove an unnamed theorem
+  fun ha _ => ha                          -- using the `example` keyword
 ```
 
 Note that the `example` keyword does not require its type
@@ -251,14 +251,14 @@ variable (p q : Prop)
 --unhide
 
 example : False → p :=
-  fun hf => nomatch hf     -- there is no work to do because there is
-                           -- nothing to match.
+  fun hf => nomatch hf   -- there is no work to do because there is
+                         -- nothing to match.
 ```
 
-In type theory, *a match with no cases may have any type*.
+*A match with no cases may have any type*.
 
-To use this pattern, recall that `¬p` is the same as `p → False`
-(a function type).
+Recall that `¬p` is the same as `p → False`
+(a function type), so:
 
 ```lean
 example : p → ¬p → q :=
@@ -273,7 +273,7 @@ example : (p → q) → (¬q → ¬p) :=
 
 We will show how all the other connectives work in the next slide deck.
 
-Variable Declarations
+Idiomatic Lean: Implicit Variable Declarations
 ===
 
 If we write

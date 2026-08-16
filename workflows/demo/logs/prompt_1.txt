@@ -1,0 +1,6 @@
+Implement mergesort, proving it terminates. Then prove that mergesort always results in a sorted list. Put this result in a theorem. Do not use all of mathlib, just what you need from lists and tactics. Do not add comments.
+
+IMPORTANT: Output ONLY LEAN 4 Code. Your response will go directly to a Lean 4 evaluator that will not accept anything except pure Lean 4 code.
+Do not enclose the code in markdown style tickmarks. Do not add explanations of your thinking.
+
+You have not tried this problem yet. 

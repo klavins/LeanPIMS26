@@ -1,0 +1,10 @@
+name: wintest1
+about: What this network is for.
+
+blocks:
+  a:
+    type: Formatter
+    template: Hello World.
+
+layout:
+  a: {at: [135, 157.5]}

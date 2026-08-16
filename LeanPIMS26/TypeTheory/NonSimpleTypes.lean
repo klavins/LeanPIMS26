@@ -488,6 +488,7 @@ def length {α} (L : List α) : Nat :=
 
 
 /-
+--hide
 Various Advanced Types (Not in Lean)
 ===
 
@@ -508,6 +509,8 @@ Path types are `I → Type`. Makes (requires) HITs to be constructive. Makes
 type checking decidable.
 
 **Many Others**: Observational type theory, modal type theory, linear type theory, ...
+
+--unhide
 -/
 
 
@@ -616,20 +619,16 @@ Writing `(succ (succ zero))` for two gets old fast. We would like to
 be able to write
 -/
 
-#check_failure (0:Naturals)
-#check_failure (1:Naturals)
-#check_failure (2:Naturals)
+#check_failure ((0:Naturals), (1:Naturals), (2:Naturals))
 
 /- Lean has classes for zero and one. -/
 
 instance : Zero Naturals := ⟨ .zero ⟩
 instance : One Naturals := ⟨ .succ .zero ⟩
-
 #check (0:Naturals)
 #check (1:Naturals)
 
-/- We can also convert Lean's `Nat` to our `Naturals` (obviating the
-need for `Naturals`, but whatever).-/
+/- We can also convert Lean's `Nat` to our `Naturals`.-/
 
 def of_nat (n : Nat) : Naturals := match n with
   | Nat.zero => .zero
@@ -640,7 +639,7 @@ instance {n : Nat} : OfNat Naturals n := ⟨ of_nat n ⟩
 #check (2:Naturals)
 
 /-
-Defining Addition
+Defining Addition for Ev and Od
 ===
 
 First we define addition for `Ev` and `Od`
@@ -658,7 +657,11 @@ mutual
     | .succ k => .succ (add_ev_od k y)
 end
 
-/- Then we define addition for `Naturals`. -/
+/-
+Defining Addition for Naturals
+===
+
+Then we define addition for `Naturals`. -/
 
 def Naturals.add (x y : Naturals) : Naturals := match x,y with
   | .inl a, .inl b => .inl (add_ev_ev a b)
@@ -680,7 +683,7 @@ def f (x y : Naturals) := x + y + 1
 
 #eval f 2 3         -- 5
 
-/- Other classes we might define for our `Naturals` type include -/
+/- Other classes we might instantiate for our `Naturals` type include -/
 
 #check (Add, Sub, Mul, Mod, Div, LT, LE)
 #check (HAdd, HSub, HMul, HDiv)

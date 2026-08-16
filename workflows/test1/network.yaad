@@ -1,0 +1,21 @@
+name: test1
+about: What this network is for.
+
+blocks:
+  Hello:
+    type: Formatter
+    template: "Proof 1+1=2 in Lean 4. Put the keyword prelude at the top of your code. Emit no comments, thoughts, backticks, or fences. You may not import anything. So you will need to define 1 and 2. "
+
+  Student:
+    type: Gemini
+
+  Grader:
+    type: Lean
+
+wires:
+  - Hello.output -> Student.body
+
+layout:
+  Hello: {at: [-15, 172.5]}
+  Student: {at: [75, 157.5]}
+  Grader: {at: [225, 150]}

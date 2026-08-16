@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "blocks": {
+    "a": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/a/output.txt"
+      },
+      "state": {}
+    }
+  }
+}

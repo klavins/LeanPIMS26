@@ -1,0 +1,39 @@
+name: tutorial
+about: What this network is for.
+
+blocks:
+  Problem:
+    type: Formatter
+    template: !file prompts/problem.txt
+
+  Student:
+    type: Gemini
+    extension: .lean
+
+  Grader:
+    type: Lean
+
+  Summarizer:
+    type: Formatter
+    template: !file prompts/summarizer.txt
+
+  Teacher:
+    type: Gemini
+
+wires:
+  - Problem.output     -> Student.body
+  - Student.response -> Grader.code
+  - Grader.errors  -> Summarizer.code
+  - Grader.sorries -> Summarizer.errors
+  - Problem.output     -> Summarizer.problem
+  - Summarizer.output -> Teacher.body
+
+layout:
+  Problem: {at: [37.5, 112.5]}
+  Student: {at: [157.5, 172.5]}
+  Grader: {at: [277.5, 172.5]}
+  Summarizer: {at: [390, 157.5]}
+  Teacher: {at: [510, 142.5]}
+  wires:
+    "Problem.output -> Summarizer.problem": [[372, 128.5]]
+    "Problem.output -> Student.body": [[139.5, 143.5]]

@@ -23,7 +23,7 @@
         { 
             "name": "Logic", 
             "decks": [
-                { "path": "src/Logic/Propositional.md", "title": "Propositional Logic" }, 
+                { "path": "src/Logic/Propositional.md", "title": "(Propositional Logic)" }, 
                 { "path": "src/Logic/Curry-Howard.md", "title": "Curry-Howard" },                    
                 { "path": "src/Logic/Connectives.md", "title": "Connectives" }, 
                 { "path": "src/Logic/FirstOrder.md", "title": "First Order Logic" },
