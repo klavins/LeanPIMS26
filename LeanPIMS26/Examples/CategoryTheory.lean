@@ -253,10 +253,12 @@ PLift Saves the Day
 
 `PLift` is a one-field structure that puts the proof in a `Type`-flavored box.
 Constructor `PLift.up` and projection `PLift.down`:
-```lean
-    PLift.up   : α → PLift α
-    PLift.down : PLift α → α
-```
+-/
+
+#check @PLift.up   -- {α : Sort u} → α → PLift α
+#check @PLift.down -- {α : Sort u} → PLift α → α
+
+/-
 (`ULift` is the same trick one level up: it boxes a `Type` instead of a `Prop`.
 We'll need it later.)
 
@@ -357,14 +359,23 @@ def OfMonotone {X Y : Type u} [Preorder X] [Preorder Y]
 /-
 When Are Two Functors Equal?
 ===
+-/
 
-```lean
+--hide
+/-- error: Type mismatch
+  G.map f
+has type
+  D.Hom (G.obj A) (G.obj B)
+but is expected to have type
+  D.Hom (F.obj A) (F.obj B) -/
+#guard_msgs in
+--unhide
 theorem Functor.ext_naive {X : Type u₁} {Y : Type u₂} {C : Category X} {D : Category Y}
     (F G : Functor C D)
     (hobj : ∀ A, F.obj A = G.obj A)
     (hmap : ∀ {A B} (f : C.Hom A B), F.map f = G.map f) : F = G := sorry
-```
 
+/-
 This fails to **typecheck**:
 
 ```
@@ -487,6 +498,13 @@ Two functors are **isomorphic** whenever there exist natural transformations
 Hence two functors `C ⥤ D` with provably different object maps can be isomorphic!
 -/
 
+--hide
+end LeanW26.CategoryTheory
+
+open CategoryTheory
+universe u v
+--unhide
+
 /-
 What does Mathlib do?
 ===
@@ -534,7 +552,7 @@ path, composition is concatenation.
 ```lean
 def Paths (V : Type u₁) : Type u₁ := V -- a type synonym; we'll see this later
 
-instance [Quiver V] : Category (Paths V) where
+instance categoryPaths : Category.{max u₁ v₁} (Paths V) where
   Hom := fun X Y : V => Quiver.Path X Y
   id _ := Quiver.Path.nil
   comp f g := Quiver.Path.comp f g
@@ -551,18 +569,20 @@ Why a `class` and Not a `structure`?
 
 Ours takes the category as an argument, so we have to name it and pass it around:
 
-```lean
-example (X : Type u) (C : Category.{v} X) (A B E : X)
-    (f : C.Hom A B) (g : C.Hom B E) : C.Hom A E := C.comp f g
-```
+-/
 
+example (X : Type u) (C : LeanW26.CategoryTheory.Category.{v} X) (A B E : X)
+    (f : C.Hom A B) (g : C.Hom B E) : C.Hom A E := C.comp f g
+
+/-
 Mathlib makes it an instance. Once `[Category C]` is in scope, we never mention it
 again: the objects **are** the type `C`, and `⟶` and `≫` find the instance themselves.
+-/
 
-```lean
 example {C : Type u} [Category.{v} C] (A B E : C)
     (f : A ⟶ B) (g : B ⟶ E) : A ⟶ E := f ≫ g
-```
+
+/-
 
 If `C` is a specific type with an existing `Category` instance, then the
 `[Category C]` can be omitted entirely!
@@ -577,16 +597,32 @@ The Cost: One Category Per Type
 `ℕ` is already a category, via its `Preorder`. Try to also make it a category by
 divisibility:
 
-```lean
+-/
+
 example (a b : ℕ) (h : a ≤ b) : a ⟶ b := homOfLE h    -- fine
 
-instance dvdCat : Category ℕ where
+section -- "section" and "local" keep this instance out of the rest of the file
+local instance dvdCat : Category ℕ where
   Hom a b := ULift (PLift (a ∣ b))
   id a := ⟨⟨dvd_refl a⟩⟩
   comp f g := ⟨⟨dvd_trans f.down.down g.down.down⟩⟩
 
+--hide
+/-- error: Type mismatch
+  homOfLE h
+has type
+  @Quiver.Hom ℕ (Preorder.smallCategory ℕ).toQuiver a b
+but is expected to have type
+  @Quiver.Hom ℕ catToReflQuiver.toQuiver a b -/
+#guard_msgs in
+--unhide
 example (a b : ℕ) (h : a ≤ b) : a ⟶ b := homOfLE h    -- the same line a second time
-```
+end
+
+/-
+Why the Second Line Fails
+===
+
 The second line fails to typecheck!
 ```
 Type mismatch
@@ -628,7 +664,8 @@ instance` within statements, but it's finicky.
 The Fix: Type Synonyms
 ===
 
-```lean
+-/
+
 def NatDvd : Type := ℕ
 def NatDvd.val (n : NatDvd) : ℕ := n
 
@@ -636,13 +673,15 @@ instance : Category NatDvd where
   Hom a b := ULift (PLift (a.val ∣ b.val))
   id a := ⟨⟨dvd_refl a.val⟩⟩
   comp f g := ⟨⟨dvd_trans f.down.down g.down.down⟩⟩
-```
 
+/-
 Both now coexist:
-```lean
+-/
+
 example (a b : ℕ)     (h : a ≤ b)         : a ⟶ b := homOfLE h
 example (a b : NatDvd) (h : a.val ∣ b.val) : a ⟶ b := ⟨⟨h⟩⟩
-```
+
+/-
 
 `NatDvd` is *definitionally* `ℕ`, but instance synthesis won't unfold a `def`
 to find instances, so `NatDvd` inherits **nothing**. Not `Category` (intended),
@@ -708,6 +747,3 @@ mistakes, fought battles, and documented their journeys. Take the free
 guidance!
 -/
 
---hide
-end LeanW26.CategoryTheory
---unhide
