@@ -28,6 +28,8 @@ In these slides we show how to formally define V-Polytopes, H-Polytopes, and Dua
 
 **Repository:** https://github.com/luzelenag123/EE598_Final_Project
 
+**These slides rely on several Mathlib libraries that we will be black-boxing**
+
 
 
 Set up
@@ -62,20 +64,32 @@ where
   finite : points.Finite
 ```
 
+Mathlib also has a type `Finset α` of finite sets, which would let us drop the `finite` field. We do not use it here, and the reason is worth knowing.
+
+
+Why `Set` and not `Finset`?
+===
+A `Finset` is a list of elements carrying a proof that it has *no duplicates*, so every operation has to maintain that invariant. Inserting an element means asking "is it already in there?", and *answering* that question requires a `DecidableEq α` instance.
+
+But equality of points in a real inner product space is not decidable, so any instance we supplied would be classical: we would be paying for a computation we can never actually run.
+
+With `Set`, duplicates are invisible from the start (`x = a ∨ x = a` is just `x = a`), and `Set.Finite` is a `Prop`, so it may be proved classically for free. The cost is that we carry the finiteness proof around by hand.
+
+
+The VPolytope namespace
+===
  Next, we'll add a few definitions directly associated to a VPolytope. For this, we create a namespace.
 
 ```lean
 namespace VPolytope
 ```
 
-The VPolytope namespace
-===
 The `carrier` is going to produce the underlying set associated to the `VPolytope` structure. 
 ```lean
 def carrier (P : VPolytope E) : Set E :=
   convexHull ℝ P.points
 ```
-The `translate` map is going to produce a new `VPolytope` resulting from translating `P` by the vector `v`. Note that we must also supply a proof that the translated set is still finite. 
+The `translate` map is going to produce a new `VPolytope` resulting from translating `P` by the vector `v`. Note that we must also supply a proof that the translated set is still finite. Translations are not decoration: they are used in the proof of the Minkowski-Weyl theorem. 
 ```lean
 def translate (P : VPolytope E) (v : E) : VPolytope E :=
   ⟨v +ᵥ P.points, P.finite.vadd_set⟩
@@ -96,9 +110,14 @@ theorem isConvex (P : VPolytope E) : Convex ℝ P.carrier :=
   convex_convexHull ℝ _
 ```
 
+The `_` in the proof of `isConvex` can be replaced with `P.points`. However, Lean is able to infer the argument!
+
+An underscore is simply an argument you decline to write: Lean recovers it from the surrounding types. Two more will turn up later in these slides, so keep an eye out.
+
+
 Exercise 1: closed and bounded
 ===
-Search Mathlib's `Compact.lean` file for theorems that help prove `isClosed` and `isBounded` in just one line.
+You have already proved that the carrier is compact, and both of these follow from that in a single line. Explore what the `IsCompact.` namespace offers and reach for dot notation.
 Write your solutions inside the `VPolytope` namespace.
 
 ```lean
@@ -135,8 +154,8 @@ Inside the Halfspace namespace we can define the carrier to be:
 ```lean
 namespace Halfspace
 
-def carrier (h : Halfspace E) : Set (E) :=
-  {x | inner ℝ h.normal x ≤ h.offset}
+def carrier (H : Halfspace E) : Set E :=
+  {x | inner ℝ H.normal x ≤ H.offset}
 ```
  We can also prove that a Halfspace is `isClosed` as follows:
 ```lean
@@ -146,17 +165,6 @@ theorem isClosed (H : Halfspace E) : IsClosed H.carrier := by
   · exact Continuous.inner continuous_const continuous_id
   · exact continuous_const
 ```
-
-Why `Set` and not `Finset`?
-===
-Lean has a type `Finset α` of finite sets, which would let us drop the `finite` field. We do not use it here, and the reason is worth knowing.
-
-A `Finset` is a list of elements carrying a proof that it has *no duplicates*, so every operation has to maintain that invariant. Inserting an element means asking "is it already in there?", and *answering* that question requires a `DecidableEq α` instance.
-
-But equality of points in a real inner product space is not decidable, so any instance we supplied would be classical: we would be paying for a computation we can never actually run.
-
-With `Set`, duplicates are invisible from the start (`x = a ∨ x = a` is just `x = a`), and `Set.Finite` is a `Prop`, so it may be proved classically for free. The cost is that we carry the finiteness proof around by hand.
-
 
 Exercise 2: convexity of a halfspace
 ===
@@ -191,8 +199,8 @@ structure HPolyhedron (E : Type*)
   [NormedAddCommGroup E]
   [InnerProductSpace ℝ E][FiniteDimensional ℝ E]
 where
-  (halfspaces : Set (Halfspace E))
-  (finite : halfspaces.Finite)
+  halfspaces : Set (Halfspace E)
+  finite : halfspaces.Finite
 
 namespace HPolyhedron
 
@@ -219,7 +227,7 @@ structure HPolytope (E : Type*)
   [NormedAddCommGroup E]
   [InnerProductSpace ℝ E][FiniteDimensional ℝ E]
 extends HPolyhedron E where
-  (bounded : Bornology.IsBounded (toHPolyhedron.carrier))
+  bounded : Bornology.IsBounded toHPolyhedron.carrier
 ```
 
 We are extending the `HPolyhedron` definition by adding the condition that it must be `bounded`. Note that this reads the same way as the `finite` field above: an `HPolytope` is an `HPolyhedron` carrying one more proof.
@@ -236,7 +244,7 @@ abbrev ℝn (n : ℕ) := EuclideanSpace ℝ (Fin n)
 
 Define `P` as the `VPolytope` generated by (0,0), (0,1), and (1,0). Define `Q` as the `HPolyhedron` generated by the equations x ≥ 0, y ≥ 0, and x + y ≤ 1.
 
-Remember that each one now needs a finiteness proof as well. The tactic `Set.toFinite _` will discharge it.
+Remember that each one now needs a finiteness proof as well. The theorem `Set.toFinite _` will discharge it. There is the second underscore: what does it stand for here? It is the set itself, as the two answers below spell out.
 
 ```lean
 -- (0,0), (0,1), (1,0)
@@ -245,7 +253,7 @@ def P : VPolytope (ℝn 2) :=
     { !₂[0, 0],
       !₂[1, 0],
       !₂[0, 1] }
-    (Set.toFinite _)
+    (Set.toFinite _) -- Or Set.toFinite ({!₂[0, 0],!₂[1, 0],!₂[0, 1]} : Set (ℝn 2))
 
 -- In terms of halfspaces now
 def h1 : Halfspace (ℝn 2) := ⟨ !₂[-1, 0], 0 ⟩  -- x ≥ 0
@@ -253,10 +261,13 @@ def h2 : Halfspace (ℝn 2) := ⟨ !₂[0, -1], 0 ⟩  -- y ≥ 0
 def h3 : Halfspace (ℝn 2) := ⟨ !₂[1, 1], 1 ⟩   -- x + y ≤ 1
 
 def Q : HPolyhedron (ℝn 2) :=
-  (HPolyhedron.mk {h1, h2, h3} (Set.toFinite _))
+  (HPolyhedron.mk {h1, h2, h3} (Set.toFinite _)) -- Or Set.toFinite ({h1, h2, h3} : Set (Halfspace (ℝn 2)))
 ```
 
-**Extra Challenge:** Define how to translate an `HPolyhedron` inside its namespace.
+Once both are defined, compare them: `P.carrier` and `Q.carrier` are the same triangle, one described by its vertices and the other by three halfspaces. That equality is the Minkowski-Weyl theorem for this single example. Note also that `Q` is bounded, so it is in fact an `HPolytope`.
+
+
+**Extra Challenge:** Define how to translate an `HPolyhedron` inside its namespace. Like `VPolytope.translate`, this is needed for the proof of the Minkowski-Weyl theorem.
 
 ```lean
 def translate (P : HPolyhedron E) (v : E) : HPolyhedron E :=
@@ -296,6 +307,8 @@ def VPolytope.dual (P : VPolytope E) : HPolyhedron E :=
   { halfspaces := (fun x => Halfspace.mk x 1) '' P.points,
     finite := P.finite.image _ }
 ```
+
+And there is the third underscore. It replaces the function being applied, `fun x => Halfspace.mk x 1`. Note that `P.finite` sits before the dot, so it is already filling the other argument of `Set.Finite.image`.
 
 A natural theorem would then be:
 
@@ -430,6 +443,9 @@ theorem separation_compact_closed
   --unbrief
 ```
 
+This is not a new theorem. Mathlib already proves it, as `geometric_hahn_banach_compact_closed`. What differs is the shape of the conclusion: Mathlib separates the two sets with a continuous linear *functional* `f`, whereas we want a *vector* `a` together with the inner product `inner ℝ a x`. The two formulations are interchangeable here by the Riesz representation theorem, which applies because `E` is finite dimensional and hence complete. So the proof above is mostly bookkeeping: invoke the Mathlib result, convert `f` into `a`, and take the midpoint of the two bounds as the separating constant.
+
+
 More main theorems
 ===
 
@@ -448,7 +464,11 @@ theorem HPolytope_is_VPolytope :
 theorem VPolytope_is_HPolytope [Nontrivial E] :
   ∀ P : VPolytope E,
   ∃ Q : HPolytope E, P.carrier = Q.carrier := sorry
+```
 
+Note the asymmetry between the last two statements: only `VPolytope_is_HPolytope` assumes `Nontrivial E`, which rules out the degenerate space `E = {0}`. Whether that hypothesis is genuinely needed is one of the things writing the proof will settle.
+
+```lean
 --hide
 end
 end LeanW26
