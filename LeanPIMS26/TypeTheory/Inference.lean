@@ -349,7 +349,6 @@ def g2 : Σ n, Vec ℕ n := sorry
 def g3 : Π f : ℕ → ℕ, Σ n, Vec ℕ (f n) := sorry
 def g4 : Σ A, Π B, Vec A B := sorry
 
-
 --hide
 end LeanW26.Inference
 --unhide

@@ -1,0 +1,188 @@
+Implement mergesort, proving it terminates. Then prove that mergesort always results in a sorted list. Put this result in a theorem. Do not use all of mathlib, just what you need from lists and tactics. Do not add comments.
+
+IMPORTANT: Output ONLY LEAN 4 Code. Your response will go directly to a Lean 4 evaluator that will not accept anything except pure Lean 4 code.
+Do not enclose the code in markdown style tickmarks. Do not add explanations of your thinking.
+
+import Mathlib.Data.List.Basic
+import Mathlib.Tactic
+
+section
+variable {α : Type}
+
+def split : List α → List α × List α
+  | [] => ([], [])
+  | [x] => ([x], [])
+  | x :: y :: rest => (x :: (split rest).1, y :: (split rest).2)
+
+theorem split_length_fst : ∀ {l : List α}, 2 ≤ l.length →
+    (split l).1.length < l.length
+  | [], h => by simp at h
+  | [x], h => by simp at h
+  | x :: y :: rest, _ => by
+    match rest with
+    | [] => simp [split]
+    | [a] => simp [split]
+    | a :: b :: rest' =>
+      have ih := split_length_fst (l := a :: b :: rest') (by simp)
+      simp only [split, List.length_cons] at ih ⊢
+      omega
+
+theorem split_length_snd : ∀ {l : List α}, 2 ≤ l.length →
+    (split l).2.length < l.length
+  | [], h => by simp at h
+  | [x], h => by simp at h
+  | x :: y :: rest, _ => by
+    match rest with
+    | [] => simp [split]
+    | [a] => simp [split]
+    | a :: b :: rest' =>
+      have ih := split_length_snd (l := a :: b :: rest') (by simp)
+      simp only [split, List.length_cons] at ih ⊢
+      omega
+
+end
+
+variable {α : Type} [LinearOrder α]
+
+def merge : List α → List α → List α
+  | [], ys => ys
+  | xs, [] => xs
+  | x :: xs, y :: ys =>
+    if x ≤ y then x :: merge xs (y :: ys)
+    else y :: merge (x :: xs) ys
+  termination_by xs ys => xs.length + ys.length
+
+def mergesort : List α → List α
+  | [] => []
+  | [x] => [x]
+  | x :: y :: rest =>
+    merge (mergesort (split (x :: y :: rest)).1) (mergesort (split (x :: y :: rest)).2)
+  termination_by l => l.length
+  decreasing_by
+    · simp_wf; exact split_length_fst (by simp)
+    · simp_wf; exact split_length_snd (by simp)
+
+def Sorted : List α → Prop
+  | [] => True
+  | [_] => True
+  | x :: y :: rest => x ≤ y ∧ Sorted (y :: rest)
+
+theorem merge_sorted : ∀ (xs ys : List α), Sorted xs → Sorted ys → Sorted (merge xs ys)
+  | [], ys, _, hys => by simpa [merge]
+  | (x :: xs), [], hxs, _ => by simpa [merge]
+  | (x :: xs), (y :: ys), hxs, hys => by
+    unfold merge
+    by_cases hxy : x ≤ y
+    · simp only [hxy, if_true]
+      have hxs' : Sorted xs := by
+        match xs with
+        | [] => trivial
+        | a :: as => exact hxs.2
+      have ih := merge_sorted xs (y :: ys) hxs' hys
+      match xs with
+      | [] =>
+        simp only [merge]
+        exact ⟨hxy, hys⟩
+      | a :: as =>
+        have hxa : x ≤ a := hxs.1
+        unfold merge
+        by_cases haa : a ≤ y
+        · simp only [haa, if_true]
+          refine ⟨hxa, ?_⟩
+          have := merge_sorted (a :: as) (y :: ys) hxs.2 hys
+          unfold merge at this
+          simp only [haa, if_true] at this
+          exact this
+        · simp only [haa, if_false]
+          refine ⟨hxy, ?_⟩
+          have := merge_sorted (a :: as) (y :: ys) hxs.2 hys
+          unfold merge at this
+          simp only [haa, if_false] at this
+          exact this
+    · simp only [hxy, if_false]
+      have hys' : Sorted ys := by
+        match ys with
+        | [] => trivial
+        | b :: bs => exact hys.2
+      have hyx : y ≤ x := not_le.mp hxy |>.le
+      match ys with
+      | [] =>
+        simp only [merge]
+        exact ⟨hyx, hxs⟩
+      | b :: bs =>
+        have hyb : y ≤ b := hys.1
+        unfold merge
+        by_cases hxb : x ≤ b
+        · simp only [hxb, if_true]
+          refine ⟨hyx, ?_⟩
+          have := merge_sorted (x :: xs) (b :: bs) hxs hys.2
+          unfold merge at this
+          simp only [hxb, if_true] at this
+          exact this
+        · simp only [hxb, if_false]
+          refine ⟨hyb, ?_⟩
+          have := merge_sorted (x :: xs) (b :: bs) hxs hys.2
+          unfold merge at this
+          simp only [hxb, if_false] at this
+          exact this
+  termination_by xs ys => xs.length + ys.length
+
+theorem mergesort_sorted : ∀ (l : List α), Sorted (mergesort l)
+  | [] => by unfold mergesort; trivial
+  | [x] => by unfold mergesort; trivial
+  | (x :: y :: rest) => by
+    unfold mergesort
+    have iha := mergesort_sorted (split (x :: y :: rest)).1
+    have ihb := mergesort_sorted (split (x :: y :: rest)).2
+    exact merge_sorted _ _ iha ihb
+  termination_by l => l.length
+  decreasing_by
+    · simp_wf; exact split_length_fst (by simp)
+    · simp_wf; exact split_length_snd (by simp)
+
+=========================================
+
+Your job is to improve this code so that it passes all Lean checks.
+
+## What went wrong
+
+Everything compiles except the four `decreasing_by` blocks. The failing part is the *inner* tactic block, the `(by simp)` you pass as the proof of `2 ≤ l.length`:
+
+```
+line 57, column 42: `simp` made no progress
+line 58, column 42: `simp` made no progress
+line 135, column 42: `simp` made no progress
+line 136, column 42: `simp` made no progress
+```
+
+(Column 42 on those lines is exactly the `simp` inside `split_length_fst (by simp)` / `split_length_snd (by simp)`.)
+
+### Why
+
+`split_length_fst` takes `{l : List α}` **implicitly**, and the only thing that determines `l` is unification with the current termination goal. When you write
+
+```lean
+exact split_length_fst (by simp)
+```
+
+the argument `by simp` is elaborated as a separate synthetic goal whose statement is still `2 ≤ ?l.length` — `?l` is an unassigned metavariable at that moment. `simp` has nothing to rewrite in a goal made of metavariables, so it reports "made no progress" instead of proving anything.
+
+### How to fix it
+
+1. **Pin down the implicit argument** so the side goal is a concrete statement, exactly as you already did correctly inside `split_length_fst`'s own proof (`split_length_fst (l := a :: b :: rest') (by simp)`):
+
+```lean
+exact split_length_fst (l := x :: y :: rest) (by ...)
+```
+
+2. **Use a proof tactic that is robust for `2 ≤ (x :: y :: rest).length`.** Since `simp` may normalize the goal to `2 ≤ rest.length + 1 + 1` and stop, prefer something that finishes arithmetic goals, e.g.
+
+```lean
+(by simp only [List.length_cons]; omega)
+```
+
+or give the term directly: `Nat.succ_le_succ (Nat.succ_le_succ (Nat.zero_le _))`.
+
+3. Alternatively, restate the lemmas with the list argument **explicit** (`theorem split_length_fst (l : List α) (h : 2 ≤ l.length) : ...`) — then `split_length_fst (x :: y :: rest) (by ...)` always elaborates against a fully known goal, and this class of error disappears.
+
+Also note: writing `exact` with an implicit-argument lemma inside `decreasing_by` is fragile because the goal shape after `simp_wf` may not be syntactically `(split _).1.length < (x :: y :: rest).length`; using `apply` plus `simp [split]`/`omega`, or explicit arguments, is safer.

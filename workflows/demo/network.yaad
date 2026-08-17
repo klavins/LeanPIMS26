@@ -1,0 +1,94 @@
+name: loop
+about: >
+  The shape a loop takes. A student writes Lean, a grader checks it, a
+  teacher turns the errors into advice, and the combiner folds the advice
+  into the student's next attempt.
+
+blocks:
+
+  Problem:                              # said once, and wired where it is read
+    type: Formatter
+    template: !file problem.txt         # no {fields}, so nothing feeds it
+
+  Student:
+    type: Claude
+    model: claude-opus-4-8
+    effort: high
+    extension: .lean
+    log: !path logs
+    addendum0: "You have not tried this problem yet. "   # what the first round
+                                        # reads — and the pin that makes the
+                                        # combiner's wire a back edge
+
+  Grader:
+    type: Lean
+
+  Summarizer:                           # what went wrong, in plain english
+    type: Formatter
+    template: !file prompts/summarize.txt
+
+  Teacher:
+    type: Claude
+
+  Combiner:                             # the advice, folded around the code
+    type: Formatter
+    template: !file prompts/combine.txt
+
+  Remaining:                            # what is broken and what is undone,
+    type: Formatter                     # folded into one signal
+    template: "{errors}{sorries}"
+
+  Done:                                 # the finish line, on the diagram:
+    type: Stop                          # nothing broken, nothing left
+    condition: empty
+
+  problem:
+    type: Label
+
+  problem_2:
+    type: Label
+
+  problem_3:
+    type: Label
+
+wires:
+  - Student.response    ->  Grader.code
+  - Grader.errors       ->  Summarizer.errors
+  - Student.response    ->  Summarizer.code
+  - Summarizer.output   ->  Teacher.body
+  - Teacher.response    ->  Combiner.suggestions
+  - Student.response    ->  Combiner.code
+  - Combiner.output     ->  Student.addendum
+  - Grader.errors       ->  Remaining.errors
+  - Grader.sorries      ->  Remaining.sorries
+  - Remaining.output    ->  Done.value
+  - Problem.output      -> problem.value
+  - problem.output      -> problem_2.value
+  - problem.output      -> problem_3.value
+  - problem_2.output    -> Student.prelude
+  - problem_3.output    -> Summarizer.problem
+
+network:
+  max_iterations: 10
+  show: !python hooks/show.py
+
+after: !python hooks/finish.py
+
+layout:
+  Student: {at: [232.5, 225]}
+  Grader: {at: [375, 225]}
+  Remaining: {at: [502.5, 225]}
+  Done: {at: [600, 225]}
+  Problem: {at: [187.5, 150]}
+  Summarizer: {at: [510, 127.5], facing: right}
+  Teacher: {at: [375, 330], facing: left}
+  Combiner: {at: [233, 315], facing: left}
+  problem: {at: [285, 150]}
+  problem_2: {at: [172.5, 225]}
+  problem_3: {at: [450, 127.5]}
+  wires:
+    "Student.response -> Summarizer.code": [[353, 256], [353, 173.5]]
+    "Summarizer.output -> Teacher.body": [[624, 158.5], [624, 376]]
+    "Grader.errors -> Summarizer.errors": [[481, 188.5]]
+    "Student.response -> Combiner.code": [[353, 256], [353, 346]]
+    "Combiner.output -> Student.addendum": [[200, 346], [200, 286]]

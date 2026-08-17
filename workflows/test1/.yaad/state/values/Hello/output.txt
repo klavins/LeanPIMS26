@@ -1,0 +1,1 @@
+Proof 1+1=2 in Lean 4. Put the keyword prelude at the top of your code. Emit no comments, thoughts, backticks, or fences. You may not import anything. So you will need to define 1 and 2. 

@@ -1,0 +1,224 @@
+Implement mergesort, proving it terminates. Then prove that mergesort always results in a sorted list. Put this result in a theorem. Do not use all of mathlib, just what you need from lists and tactics. Do not add comments.
+
+IMPORTANT: Output ONLY LEAN 4 Code. Your response will go directly to a Lean 4 evaluator that will not accept anything except pure Lean 4 code.
+Do not enclose the code in markdown style tickmarks. Do not add explanations of your thinking.
+
+import Mathlib.Data.List.Basic
+import Mathlib.Tactic
+
+def merge : List Nat → List Nat → List Nat
+  | [], ys => ys
+  | (x :: xs), [] => x :: xs
+  | x :: xs, y :: ys =>
+    if x ≤ y then x :: merge xs (y :: ys)
+    else y :: merge (x :: xs) ys
+  termination_by xs ys => xs.length + ys.length
+
+def split : List Nat → List Nat × List Nat
+  | [] => ([], [])
+  | [x] => ([x], [])
+  | x :: y :: rest =>
+    (x :: (split rest).1, y :: (split rest).2)
+
+theorem split_length_fst (l : List Nat) : (split l).1.length ≤ l.length := by
+  induction l using split.induct with
+  | case1 => simp [split]
+  | case2 x => simp [split]
+  | case3 x y rest ih =>
+    simp only [split]
+    simp
+    omega
+
+theorem split_length_snd (l : List Nat) : (split l).2.length ≤ l.length := by
+  induction l using split.induct with
+  | case1 => simp [split]
+  | case2 x => simp [split]
+  | case3 x y rest ih =>
+    simp only [split]
+    simp
+    omega
+
+theorem split_length_fst_lt (x y : Nat) (rest : List Nat) :
+    (split (x :: y :: rest)).1.length < (x :: y :: rest).length := by
+  simp only [split]
+  have := split_length_fst rest
+  simp
+  omega
+
+theorem split_length_snd_lt (x y : Nat) (rest : List Nat) :
+    (split (x :: y :: rest)).2.length < (x :: y :: rest).length := by
+  simp only [split]
+  have := split_length_snd rest
+  simp
+  omega
+
+def mergeSort : List Nat → List Nat
+  | [] => []
+  | [x] => [x]
+  | x :: y :: rest =>
+    merge (mergeSort (split (x :: y :: rest)).1) (mergeSort (split (x :: y :: rest)).2)
+  termination_by l => l.length
+  decreasing_by
+    · simp_wf
+      exact split_length_fst_lt x y rest
+    · simp_wf
+      exact split_length_snd_lt x y rest
+
+def Sorted : List Nat → Prop
+  | [] => True
+  | [_] => True
+  | x :: y :: rest => x ≤ y ∧ Sorted (y :: rest)
+
+theorem sorted_cons_of_le_head {x : Nat} {l : List Nat}
+    (hx : ∀ a ∈ l, x ≤ a) (hl : Sorted l) : Sorted (x :: l) := by
+  cases l with
+  | nil => exact True.intro
+  | cons y ys =>
+    refine ⟨hx y (by simp), hl⟩
+
+theorem merge_mem {xs ys : List Nat} {a : Nat} :
+    a ∈ merge xs ys → a ∈ xs ∨ a ∈ ys := by
+  induction xs, ys using merge.induct with
+  | case1 ys =>
+    intro h
+    right
+    simpa [merge] using h
+  | case2 x xs =>
+    intro h
+    left
+    simpa [merge] using h
+  | case3 x xs y ys hle ih =>
+    intro h
+    simp only [merge, hle, if_true] at h
+    rcases List.mem_cons.mp h with h1 | h1
+    · left; exact List.mem_cons.mpr (Or.inl h1)
+    · rcases ih h1 with h2 | h2
+      · left; exact List.mem_cons.mpr (Or.inr h2)
+      · right; exact h2
+  | case4 x xs y ys hle ih =>
+    intro h
+    simp only [merge, hle, if_false] at h
+    rcases List.mem_cons.mp h with h1 | h1
+    · right; exact List.mem_cons.mpr (Or.inl h1)
+    · rcases ih h1 with h2 | h2
+      · left; exact h2
+      · right; exact List.mem_cons.mpr (Or.inr h2)
+
+theorem sorted_tail {x : Nat} {l : List Nat} (h : Sorted (x :: l)) : Sorted l := by
+  cases l with
+  | nil => exact True.intro
+  | cons y ys => exact h.2
+
+theorem sorted_head_le {x : Nat} {l : List Nat} (h : Sorted (x :: l)) :
+    ∀ a ∈ l, x ≤ a := by
+  induction l generalizing x with
+  | nil => intro a ha; simp at ha
+  | cons y ys ih =>
+    intro a ha
+    rcases List.mem_cons.mp ha with rfl | ha1
+    · exact h.1
+    · exact le_trans h.1 (ih (sorted_tail h) a ha1)
+
+theorem sorted_merge (xs ys : List Nat) (hx : Sorted xs) (hy : Sorted ys) :
+    Sorted (merge xs ys) := by
+  induction xs, ys using merge.induct with
+  | case1 ys => simpa [merge] using hy
+  | case2 x xs => simpa [merge] using hx
+  | case3 x xs y ys hle ih =>
+    simp only [merge, hle, if_true]
+    apply sorted_cons_of_le_head
+    · intro a ha
+      rcases merge_mem ha with h1 | h1
+      · exact sorted_head_le hx a h1
+      · rcases List.mem_cons.mp h1 with rfl | h2
+        · exact hle
+        · exact le_trans hle (sorted_head_le hy a h2)
+    · exact ih (sorted_tail hx) hy
+  | case4 x xs y ys hle ih =>
+    simp only [merge, hle, if_false]
+    apply sorted_cons_of_le_head
+    · intro a ha
+      have hle' : y ≤ x := le_of_not_le hle
+      rcases merge_mem ha with h1 | h1
+      · rcases List.mem_cons.mp h1 with rfl | h2
+        · exact hle'
+        · exact le_trans hle' (sorted_head_le hx a h2)
+      · exact sorted_head_le hy a h1
+    · exact ih hx (sorted_tail hy)
+
+theorem mergeSort_sorted (l : List Nat) : Sorted (mergeSort l) := by
+  induction l using mergeSort.induct with
+  | case1 => exact True.intro
+  | case2 x => exact True.intro
+  | case3 x y rest ih1 ih2 =>
+    rw [mergeSort]
+    apply sorted_merge
+    · exact ih1
+    · exact ih2
+
+=========================================
+
+Your job is to improve this code so that it passes all Lean checks.
+
+## What went wrong
+
+### 1 & 2. The `decreasing_by` goals were already normalized by `simp_wf`
+
+Your helper lemmas are stated with `< (x :: y :: rest).length`, but after `simp_wf` the goal has been rewritten: `List.length (x :: y :: rest)` was unfolded to `rest.length + 1 + 1` and the `<` was turned into the definitionally equal `≤ rest.length + 1`. So the term you supply doesn't match syntactically:
+
+```
+line 58, column 6: Type mismatch
+  split_length_fst_lt x y rest
+has type
+  (split (x :: y :: rest)).1.length < (x :: y :: rest).length
+but is expected to have type
+  (split (x :: y :: rest)).1.length ≤ rest.length + 1
+
+line 60, column 6: Type mismatch
+  split_length_snd_lt x y rest
+has type
+  (split (x :: y :: rest)).2.length < (x :: y :: rest).length
+but is expected to have type
+  (split (x :: y :: rest)).2.length ≤ rest.length + 1
+```
+
+Fix: don't use `exact` after `simp_wf`. Either drop `simp_wf` and use `exact split_length_fst_lt ..` directly, or close the goal robustly with something like
+
+```lean
+decreasing_by
+  · have := split_length_fst_lt x y rest; simp [List.length] at this ⊢; omega
+```
+
+or better, state the helper lemmas already in the reduced form (`(split (x :: y :: rest)).1.length < rest.length + 2`) and finish with `omega` after `have`.
+
+### 3. Wrong lemma name
+
+```
+line 136, column 27: Unknown identifier `le_of_not_le`
+```
+
+In current Mathlib this is `le_of_not_ge` (or `Nat.le_of_not_le` / `Nat.not_lt.mp`, or simply `by omega` since these are naturals). Check the name exists before using it.
+
+### 4 & 5. `Sorted (mergeSort [])` is not syntactically `True`
+
+`Sorted` and `mergeSort` are definitions by well-founded/structural recursion; the elaborator will not unfold them automatically when checking `True.intro` against `Sorted (mergeSort [])`.
+
+```
+line 146, column 13: Type mismatch
+  True.intro
+has type
+  True
+but is expected to have type
+  Sorted (mergeSort [])
+
+line 147, column 15: Type mismatch
+  True.intro
+has type
+  True
+but is expected to have type
+  Sorted (mergeSort [x])
+```
+
+You must unfold first, e.g. `rw [mergeSort]; exact True.intro`, or `simp [mergeSort, Sorted]`, or `show Sorted []` / `exact trivial` after `unfold mergeSort`. Note you did this correctly in `case3` with `rw [mergeSort]` — apply the same treatment to the base cases.
+
+(Also note: `mergeSort` is defined by well-founded recursion, so `rw [mergeSort]` relies on the generated equation lemmas; if it misbehaves, use `simp [mergeSort]` or `unfold mergeSort`.)

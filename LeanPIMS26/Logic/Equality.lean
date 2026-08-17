@@ -56,7 +56,7 @@ Refl is Powerful
 ===
 
 Terms that are beta-reducible to each other are considered definitionally equal.
-You can show many of equalities automatically -/
+You can show many equalities automatically -/
 
 example : 1 ~ 1 :=
   MyEq.refl 1
@@ -917,6 +917,153 @@ structure K2 where
 /- Define the natural equivalence  -/
 
 def K_equiv : K1 ≃ K2 := sorry
+
+/-
+Breaking Lean (Advanced)
+===
+
+Definitional proof irrelevance, propositional extensionality, and impredicative
+`Prop` together make Lean's theory _not_ strongly normalizing
+
+<div class='fn'>Andreas Abel ; Thierry Coquand, <a href="https://lmcs.episciences.org/6606">https://lmcs.episciences.org/6606</a></div>
+
+-/
+
+--hide
+set_option linter.defProp false
+--unhide
+
+/- In the simply typed lambda calculus, you cannot write `λ x => x x`. -/
+
+#check_failure (fun x => x x)                    -- δ is not definable
+#check_failure (fun x => x x) (fun x => x x)     -- neither is Ω
+
+/-
+
+The issue is: if we want to build a type for `Ω`, it should be something like:
+
+```lean
+def T : Type u := ∀ (X : Type u), X → X
+```
+
+But this gives a universe error: `∀ X : Type u, X → X` lives in `Type (u+1)`,
+one level above the `X` it quantifies over.
+
+Building δ
+===
+
+If we move to `Prop` it works:
+
+-/
+
+def T : Prop := ∀ (p : Prop), p → p
+
+/- Now we may define `δ`, which plays the role of `λ x => x x`. -/
+
+def δ : T → T := fun (z : T) => (z (T → T) id) z
+
+/- We would like to form `Ω := δ δ`, but this does not typecheck.
+So we define `δ'` that behaves like `δ` but repackaged as a proof of `T`. -/
+
+def δ' : T := fun p a =>
+  cast (propext (iff_of_true id a) : (T → T) = p) δ
+
+/-
+
+Since `T → T` and `p` are both true `Prop`s (witnessed by `id` and `a`), `propext`
+makes them *equal*, and `cast` re-types `δ` as a proof of `p`.
+
+<div class="fn"><tt>cast</tt> is normally used to show that two non-definitionally
+equal types are equal for some other reason, like arithmetic. For example, you
+can use cast to show that <tt>Fin (n+m) = Fin (m+n)</tt>.
+
+Defining Ω
+===
+
+From `δ` and `δ'` we define `Ω`. -/
+
+def Ω : T := δ δ'
+
+/- Then we get "infinite" recursion
+
+```
+#reduce (proofs := true) Ω      -- maximum recursion depth has been reached
+```
+
+Why does `Ω` loop?
+
+By proof irrelevance its proof is definitionally `rfl`,
+so the `cast` reduces away and `δ δ'` reappears so each
+unfolding of `Ω` reproduces `Ω`.
+
+
+Our next goal is to show that `Ω` can make `rfl` loop.
+
+
+A Loopable Type
+===
+
+We define an inductive type that is recursive, a singleton, and inhabited as follows:
+
+-/
+
+inductive Loop : Prop where
+  | mk (h : False → Loop) : Loop
+
+/- `Loop` is clearly inhabited: -/
+
+def loop : Loop := Loop.mk False.elim
+
+/- And `Loop` is a singleton by proof irrelevance -/
+
+example : ∃ p : Loop, ∀ q, p = q := ⟨ loop, fun q => by trivial ⟩
+
+/-
+Looping
+===
+
+Here is another proof of `Loop` using `Ω` -/
+
+def loop' : Loop := (Ω Loop) loop         -- since Ω Loop : Loop → Loop
+
+/- Since both are proofs of `Loop`, by proof irrelevance they are the same.  -/
+
+example : loop' = loop := rfl
+
+/- Now define `F` to be `0` by eliminating `loop'` and ignoring the proof
+that Lean provides and simply returning zero. -/
+
+noncomputable def F : Nat :=
+  match loop' with
+  | .mk _ => 0
+
+/- Attempting to show that `F = 0` will loop forever (or until Lean gives up).
+
+```lean
+example : F = 0 := rfl -- maximum recursion depth has been reached
+```
+
+Exercises
+===
+
+<ex /> Prove the following using `rfl` and explain why neither proof crashes the type checker.
+-/
+
+example : Ω = δ' := sorry
+example : Ω = fun p a => a := sorry
+
+/-
+<ex/> Change `def loop'` to `theorem loop'`. Predict what happens to
+`example : F = 0 := rfl`. Explain the behavior you observe.
+
+<ex /> `δ'` can disguise `δ` as a proof of any true proposition. Try to use
+the same trick to prove `False` — for instance, what goes wrong with
+`Ω False ?_`? Explain why this construction breaks normalization but
+not consistency.
+
+-/
+
+
 
 --hide
 end Natural

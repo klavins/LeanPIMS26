@@ -1,0 +1,42 @@
+name: loop
+about: What this network is for.
+
+blocks:
+  Student:
+    type: Gemini
+
+  Problem:
+    type: Formatter
+    template: !file prompts/problem.txt
+
+  Grader:
+    type: Lean
+
+  Summarizer:
+    type: Formatter
+    template: !file prompts/summarizer.txt
+
+  Teacher:
+    type: Gemini
+
+wires:
+  - Problem.output -> Student.body
+  - Student.response -> Grader.code
+  - Student.response -> Summarizer.code
+  - Grader.errors  -> Summarizer.errors
+  - Problem.output -> Summarizer.problem
+  - Summarizer.output -> Teacher.prelude
+  - Teacher.response    -> Student.addendum
+
+layout:
+  Student: {at: [127.5, 142.5]}
+  Problem: {at: [-22.5, 157.5]}
+  Grader: {at: [262.5, 142.5]}
+  Summarizer: {at: [217.5, 247.5], facing: left}
+  Teacher: {at: [90, 247.5], facing: left}
+  wires:
+    "Student.response -> Summarizer.code": [[230, 218.5], [345, 218.5], [345, 293.5]]
+    "Problem.output -> Summarizer.problem": [[55.5, 231.5], [321, 231.5]]
+    "Grader.errors -> Summarizer.errors": [[369.5, 173.5], [369.5, 308.5]]
+    "Teacher.response -> Student.addendum": [[76.5, 203.5]]
+    "Untitled 1.response -> Student.addendum": [[-163.5, 203.5]]

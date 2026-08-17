@@ -1,6 +1,17 @@
 
 A Tour of L∃∀N
 ===
+You have written my favorite computer game.
+Kevin Buzzard to Leo DeMoura [<a href="https://leodemoura.github.io/static/floc26/">floc26</a>].
+
+Routine
+===
+
+Each slide deck contains exercises interspersed with the slides, mostly done in class
+
+When we finish a slide deck, we will pause to let you work on the exercises.
+
+
 
 About Lean
 ===
@@ -21,17 +32,19 @@ automation making it easier than ever to use a proof assistant.
 Installing Lean
 ===
 
-The easiest way to install Lean is to follow the quickstart guide at
-- [Lean Quickstart](https://lean-lang.org/lean4/doc/quickstart.html)
-
 You will need first install VS Code:
 
 - [VS Code](https://code.visualstudio.com/)
 
 Then go to `View > Extensions` and search for "Lean 4" and install it.
 
-This will put a `∀` in the upper right menu bar of VS Code. From there, you can
+This will put a `∀` in the upper right menu bar of VS Code.
+
+From there, you can
 create a new project, which should install Lean and all of the associated tools.
+
+<div class="fn">You can also follow the quickstart guide at
+<a href="https://lean-lang.org/lean4/doc/quickstart.html">[Lean Quickstart]</a>
 
 Lean "Project" Types
 ===
@@ -40,8 +53,7 @@ With the VS Code Extension, you can install two types of projects:
 
 - **Standalone** project. Just the basics.
 
-- **Mathlib** project. Includes a *huge* library of most basic and several advanced areas of mathematics.
-Choose this if in particular if you want to use real numbers, algebra, sets, matrices, etc.
+- **Mathlib** project. Includes a *huge* library of most basic and several advanced areas of mathematics. Choose this if in particular if you want to use real numbers, algebra, sets, matrices, etc.
 
 Despite its size, I recommend starting a *Mathlib* based project. You never know
 when you might need something from Mathlib.
@@ -51,22 +63,20 @@ Notes:
   - I don't like the option where it creates a new workspace.
   - Don't make a new project every time you want to try something out.
       - Each project is about 6GB to start with
-      - Instead, create a single monolithic project and make sub-directories for ideas you want to explore.
+      - Instead, create a single monolithic project and make sub-directories for
+        ideas you want to explore.
 
 Directory Structure
 ===
 
-If you create a new project called `EE598_Turing`, you will get a whole directory of stuff:
+If you create a new project called `PIMS`, you will get a whole directory of stuff:
 
 ```
-   EE598_Turing
-     .github/
+   PIMS
      .lake/
-     EE598_Turing/                 <-- put your code here
+     PIMS/                 <-- put your code in here here
        Basic.lean
-       HW_I_2.lean                 <-- Today's HW file
-     .gitignore
-     EE598_Turing.lean
+     PIMS.lean
      lake-manifest.json
      lakefile.toml
      lean-toolchain
@@ -80,10 +90,9 @@ Open this and you can start playing with Lean.
 Exercises
 ===
 
-<ex/> Create a Mathlib-based project using `EE598_Lastname` as the project name.
-E.g, if your last name is Turing, name your project `EE598_Turing`.
+<ex/> Create a Mathlib-based project using `PIMS as the project name.
 
-<ex/> Create a new file `HW_I_2.lean` so that it has the code:
+<ex/> Create a new file `Sandbox.lean` so that it has the code:
 
 
 ```lean
@@ -101,22 +110,22 @@ example (x y z : ℚ)
 
 Open the Lean Infoview (`∀` menu) and check the results.
 
-**Note:** If you do `import Mathlib`, VS Code will launch a process to compile *everything* in
+**Note:** If you do `import Mathlib`, VS Code may launch a process to compile *everything* in
 Mathlib, which can take an hour or so. At some point this week, do this so that you don't
 constantly need to hunt for the exact `Mathlib` directory you need.
 
 Course Notes
 ===
 
-The course notes I am presenting are on under construction Github at
-> [https://github.com/klavins/LeanW26](https://github.com/klavins/LeanW26)
+The course notes I am presenting are aT
+> [https://github.com/klavins/LeanPIMS26](https://github.com/klavins/LeanPIMS26)
 
 The source code for every slide deck is in an executable `.lean` file.
 
-Feel free to clone this repo as well, but note I will make updates constantly. So periodically do
+Feel free to clone this repo as well:
 
 ```bash
-git update
+git clone https://github.com/klavins/LeanPIMS26.git
 ```
 
 to make sure you have the latest version.
@@ -183,7 +192,7 @@ We will go into proofs in great detail later. For now, know that you can
 state theorems using the `theorem` keyword. 
 ```lean
 theorem my_amazing_result (p : Prop) : p → p :=
-  fun h => h
+  id
 ```
  In this expression,
 
@@ -192,13 +201,13 @@ theorem my_amazing_result (p : Prop) : p → p :=
   (p : Prop)        is an assumption that p is a true or false statement
   p → p             is the actual theorem
   :=                delineates the theorem from the proof
-  λ h => h          (the identity function) is the proof
+  id                (the identity function) is the proof
 ```
 
 You can use your theorems to prove other theorems: 
 ```lean
-theorem a_less_amazing_result : True → True := by
-  apply my_amazing_result
+theorem a_less_amazing_result : True → True :=
+  my_amazing_result True
 ```
 
 Examples vs Proofs
@@ -208,7 +217,7 @@ Results don't have to be named, which is useful for trying things
 out or when you don't need the result again. 
 ```lean
 example (p : Prop) : p → p :=
-  fun h => h
+  id
 
 example (p q r : Prop) : (p → q) ∧ (q → r) → (p → r) :=
   fun ⟨ hpq, hqr ⟩ hp
@@ -262,7 +271,7 @@ def remove_zeros (L : List ℕ) : List ℕ := match L with
 #eval remove_zeros [1,2,3,0,5,0,0]     -- [1,2,3,5]
 ```
  Note the similarity between `def` and `theorem`. The latter is
-simply a special kind of definition. 
+simply a special kind of definition.  
 
 Exercises
 ===
@@ -272,7 +281,8 @@ of natural numbers. Use `remove_zeros` as a template. Test your
 code using `#eval`.
 
 
-
+```lean
+/-
 Documentation and Resources
 ===
 
@@ -309,55 +319,19 @@ Exercises
 ===
 
 <ex /> Go to Loogle and look up `List.find?`. There should be two examples
-of how to use this function. Try them in your `HW_I_2.lean` file.
-
-Homework Routine
-===
-
-Each slide deck contains
-- Warm up exercises interspersed with the slides, mostly done in class
-- A final set of exercises that should be done on your own
-
-When we finish a slide deck, **all** solutions should be put
-into a file with the same name in your project directory. This
-is primarily a way to backup your code.
-
-To turn in a solution set, submit a standalone file to Canvas.
-
-I will download all solution sets into a Lean project and
-execute your code to grade them.
-
-Late homework accrues 10% reduction per week.
-
-
-Exercises
-===
-
-<ex/> If you have not done so already, create a file called `HW_I_2.lean`
-in the same directory as `Basic.lean`.
-Put your solutions to the exercises in this slide deck in this file.
-- Homework files should restate each problem.
-- Textual answers should be written as comments.
-- Lean code should be executable assuming Mathlib is installed and
-should produce no errors.
-- If you are stuck on part of a theorem, use `sorry` for
-partial credit and move on with your life.
-
-<ex/> Make a github repo for your homework using the same as your project
-(e.g. `EE598_Turing`). You will use this repo to save your homework. Make the repo `private`.
-
-<ex/> Once you are satisfied with your work, submit the `HW_I_2.lean` file
-to Canvas under the corresponding assignment.
-
-
+of how to use this function. Try them in your `PIMS.lean` file.
+```
 
 License
 ===
 
-Copyright (C) 2025  Eric Klavins
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.   
+(at your option) any later version.  
+
+Please see the full license at
+<a href="https://github.com/klavins/LeanPIMS26">
+https://github.com/klavins/LeanPIMS26
+</a>
 
