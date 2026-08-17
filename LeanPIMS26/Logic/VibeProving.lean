@@ -18,8 +18,8 @@ namespace LeanW26
 /-
 Vibe Proving
 ===
-Mathematics is the cheapest science. Unlike physics or chemistry, it does not require any expensive equipment. All one needs for mathematics is a pencil and paper (George Pólya).
-You will also need a Claude Code account and a reasonably powerful laptop.
+In mathematics the art of proposing a question must be held of higher value than solving it.
+Georg Cantor
 -/
 
 end LeanW26

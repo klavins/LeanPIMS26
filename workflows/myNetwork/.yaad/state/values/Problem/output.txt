@@ -1,0 +1,1 @@
+prove 1+1 in lean4. Output only code; no comments or thinking processes. No backticks or fences. The code will be sent directly into a lean 4 LSP.

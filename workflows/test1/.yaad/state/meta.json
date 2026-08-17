@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "blocks": {
+    "Hello": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/Hello/output.txt"
+      },
+      "state": {}
+    },
+    "Student": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "response": "values/Student/response.txt"
+      },
+      "state": {
+        "calls": 1,
+        "log_count": 0
+      }
+    },
+    "Grader": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "errors": "values/Grader/errors.json",
+        "sorries": "values/Grader/sorries.json"
+      },
+      "state": {}
+    }
+  }
+}

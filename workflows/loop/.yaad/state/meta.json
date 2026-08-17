@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "blocks": {
+    "Problem": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/Problem/output.txt"
+      },
+      "state": {}
+    },
+    "Student": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "response": "values/Student/response.txt"
+      },
+      "state": {
+        "calls": 1,
+        "log_count": 0
+      }
+    },
+    "Grader": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "errors": "values/Grader/errors.json",
+        "sorries": "values/Grader/sorries.json"
+      },
+      "state": {}
+    },
+    "Summarizer": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "output": "values/Summarizer/output.txt"
+      },
+      "state": {}
+    },
+    "Teacher": {
+      "steps": 1,
+      "published": true,
+      "ports": {
+        "response": "values/Teacher/response.txt"
+      },
+      "state": {
+        "calls": 1,
+        "log_count": 0
+      }
+    }
+  }
+}

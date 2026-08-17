@@ -1,0 +1,15 @@
+[
+  "line 3, column 0: failed to construct `T.ctorIdx` for `Nat`:\n  Unknown constant `Nat.casesOn`",
+  "line 7, column 0: failed to construct `T.ctorIdx` for `Eq`:\n  Unknown constant `Eq.casesOn`",
+  "line 10, column 0: Unknown constant `Lean.TrailingParserDescr`",
+  "line 10, column 0: invalid syntax node kind `\u00abterm_=_\u00bb`",
+  "line 10, column 0: Unknown constant `Lean.PrettyPrinter.Unexpander`",
+  "line 13, column 2: Unknown constant `PProd.mk`",
+  "line 16, column 59: expected token",
+  "line 20, column 44: expected token",
+  "line 20, column 29: Unknown identifier `add`\n\nNote: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`.",
+  "line 25, column 50: expected token",
+  "line 25, column 31: Unknown identifier `add`\n\nNote: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`.",
+  "line 30, column 39: expected token",
+  "line 30, column 31: Unknown identifier `add`\n\nNote: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`."
+]

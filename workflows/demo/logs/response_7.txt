@@ -1,0 +1,144 @@
+import Mathlib.Data.List.Basic
+import Mathlib.Tactic
+
+section
+variable {α : Type}
+
+def split : List α → List α × List α
+  | [] => ([], [])
+  | [x] => ([x], [])
+  | x :: y :: rest => (x :: (split rest).1, y :: (split rest).2)
+
+theorem split_length_fst : ∀ {l : List α}, 2 ≤ l.length →
+    (split l).1.length < l.length
+  | [], h => by simp at h
+  | [x], h => by simp at h
+  | x :: y :: rest, _ => by
+    match rest with
+    | [] => simp [split]
+    | [a] => simp [split]
+    | a :: b :: rest' =>
+      have ih := split_length_fst (l := a :: b :: rest') (by simp)
+      simp only [split, List.length_cons] at ih ⊢
+      omega
+
+theorem split_length_snd : ∀ {l : List α}, 2 ≤ l.length →
+    (split l).2.length < l.length
+  | [], h => by simp at h
+  | [x], h => by simp at h
+  | x :: y :: rest, _ => by
+    match rest with
+    | [] => simp [split]
+    | [a] => simp [split]
+    | a :: b :: rest' =>
+      have ih := split_length_snd (l := a :: b :: rest') (by simp)
+      simp only [split, List.length_cons] at ih ⊢
+      omega
+
+end
+
+variable {α : Type} [LinearOrder α]
+
+def merge : List α → List α → List α
+  | [], ys => ys
+  | xs, [] => xs
+  | x :: xs, y :: ys =>
+    if x ≤ y then x :: merge xs (y :: ys)
+    else y :: merge (x :: xs) ys
+  termination_by xs ys => xs.length + ys.length
+
+def mergesort : List α → List α
+  | [] => []
+  | [x] => [x]
+  | x :: y :: rest =>
+    merge (mergesort (split (x :: y :: rest)).1) (mergesort (split (x :: y :: rest)).2)
+  termination_by l => l.length
+  decreasing_by
+    · have h := split_length_fst (l := x :: y :: rest) (by simp)
+      simp only [List.length_cons] at h ⊢
+      omega
+    · have h := split_length_snd (l := x :: y :: rest) (by simp)
+      simp only [List.length_cons] at h ⊢
+      omega
+
+def Sorted : List α → Prop
+  | [] => True
+  | [_] => True
+  | x :: y :: rest => x ≤ y ∧ Sorted (y :: rest)
+
+theorem merge_sorted : ∀ (xs ys : List α), Sorted xs → Sorted ys → Sorted (merge xs ys)
+  | [], ys, _, hys => by simpa [merge]
+  | (x :: xs), [], hxs, _ => by simpa [merge]
+  | (x :: xs), (y :: ys), hxs, hys => by
+    unfold merge
+    by_cases hxy : x ≤ y
+    · simp only [hxy, if_true]
+      have hxs' : Sorted xs := by
+        match xs with
+        | [] => trivial
+        | a :: as => exact hxs.2
+      have ih := merge_sorted xs (y :: ys) hxs' hys
+      match xs with
+      | [] =>
+        simp only [merge]
+        exact ⟨hxy, hys⟩
+      | a :: as =>
+        have hxa : x ≤ a := hxs.1
+        unfold merge
+        by_cases haa : a ≤ y
+        · simp only [haa, if_true]
+          refine ⟨hxa, ?_⟩
+          have := merge_sorted (a :: as) (y :: ys) hxs.2 hys
+          unfold merge at this
+          simp only [haa, if_true] at this
+          exact this
+        · simp only [haa, if_false]
+          refine ⟨hxy, ?_⟩
+          have := merge_sorted (a :: as) (y :: ys) hxs.2 hys
+          unfold merge at this
+          simp only [haa, if_false] at this
+          exact this
+    · simp only [hxy, if_false]
+      have hys' : Sorted ys := by
+        match ys with
+        | [] => trivial
+        | b :: bs => exact hys.2
+      have hyx : y ≤ x := not_le.mp hxy |>.le
+      match ys with
+      | [] =>
+        simp only [merge]
+        exact ⟨hyx, hxs⟩
+      | b :: bs =>
+        have hyb : y ≤ b := hys.1
+        unfold merge
+        by_cases hxb : x ≤ b
+        · simp only [hxb, if_true]
+          refine ⟨hyx, ?_⟩
+          have := merge_sorted (x :: xs) (b :: bs) hxs hys.2
+          unfold merge at this
+          simp only [hxb, if_true] at this
+          exact this
+        · simp only [hxb, if_false]
+          refine ⟨hyb, ?_⟩
+          have := merge_sorted (x :: xs) (b :: bs) hxs hys.2
+          unfold merge at this
+          simp only [hxb, if_false] at this
+          exact this
+  termination_by xs ys => xs.length + ys.length
+
+theorem mergesort_sorted : ∀ (l : List α), Sorted (mergesort l)
+  | [] => by unfold mergesort; trivial
+  | [x] => by unfold mergesort; trivial
+  | (x :: y :: rest) => by
+    unfold mergesort
+    have iha := mergesort_sorted (split (x :: y :: rest)).1
+    have ihb := mergesort_sorted (split (x :: y :: rest)).2
+    exact merge_sorted _ _ iha ihb
+  termination_by l => l.length
+  decreasing_by
+    · have h := split_length_fst (l := x :: y :: rest) (by simp)
+      simp only [List.length_cons] at h ⊢
+      omega
+    · have h := split_length_snd (l := x :: y :: rest) (by simp)
+      simp only [List.length_cons] at h ⊢
+      omega

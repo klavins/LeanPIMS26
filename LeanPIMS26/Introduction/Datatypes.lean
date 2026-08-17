@@ -9,9 +9,9 @@ import Mathlib
 import Lean
 
 /-
-Datatypes
+A Pragmatic Introduction to Types
 ===
-
+Curry-Howard Isomorphism: <u>propositions are types!</u>
 
 Inductively Defined Types
 ===
@@ -91,7 +91,7 @@ Three Valued Logic
 ===
 
 Not all inductive types have _recursive_ constructors. `Bool` has only base cases.
-Here's a similar example:
+Here's a simple example:
 -/
 
 inductive TriBool where
@@ -115,8 +115,7 @@ def and (A B : TriBool) :=
 Option
 ===
 
-The `Option` type is useful in situations where a value might not be available.
-This is an example of an inductive type that depends on another type.
+The `Option` type is an example of an inductive type that depends on another type.
 
 -/
 
@@ -152,10 +151,17 @@ def my_func (L : List ℕ) : List ℕ :=
 
 /-
 `Option` is an example of a `Monad`. A similar Monad is `Except`, which
-also takes a string argument. We'll get to these later.
+also takes a string argument.
 -/
 
-#check Except
+#print Except
+
+/-
+```lean
+Except.error : {ε : Type u} → {α : Type v} → ε → Except ε α
+Except.ok : {ε : Type u} → {α : Type v} → α → Except ε α
+```
+-/
 
 
 /-
@@ -178,8 +184,8 @@ Note that the type of non-negative reals is defined as `NNReal` in Mathlib.
 Binary Trees
 ===
 
-Here is a an extended example where we define a polymorphic Binary Tree type and
-show how to start a library of functions for it. -/
+We define a polymorphic Binary Tree type and
+start a library of functions for it. -/
 
 inductive BTree (A : Type) where
   | leaf : A → BTree A
@@ -212,7 +218,7 @@ def my_tree := node 1 (leaf 2) (node 3 (leaf 4) (leaf 5))
 Defining Functions on Inductive Types
 ===
 
-Here's an example function to convert tree to a list. -/
+To convert tree to a list: -/
 
 def to_list {A : Type} (T : BTree A) : List A :=
   match T with
@@ -236,9 +242,16 @@ function. It requires that `A` has a `toString` instance we can use (more on thi
 def to_str {A : Type} [ToString A] (T : BTree A) : String :=
   match T with
   | leaf a => toString a
-  | node a L R =>  "(" ++ (toString a) ++ " " ++ (to_str L) ++ " " ++ (to_str R) ++ ")"
+  | node a L R =>  "(" ++ (toString a) ++ " "
+                       ++ (to_str L) ++ " "
+                       ++ (to_str R) ++ ")"
 
 /- The we define a _representation_ of a tree (using the representation of `A`).-/
+
+/-
+Instantiating Repr
+===
+-/
 
 instance {A : Type} [Repr A] [ToString A] : Repr (BTree A) := {
   reprPrec := fun T _ => to_str T
@@ -254,7 +267,7 @@ Now when we evaluate we get: -/
 Mapping to Trees
 ===
 
-Here is an example function. Note the use of curly braces since `A` and
+Note the use of curly braces since `A` and
 `B` are inferable from the argument `f`.
 
 -/
@@ -266,15 +279,12 @@ def map {A B : Type} (f : A → B) (T : BTree A) : BTree B :=
 
 #eval map (fun x => x*x) (node 0 my_tree my_tree)
 
-/- By the way, since we opened the namespace `BTree`, the functions we defined
-are in the `BTree` namespace, accessible after we close it using `.` -/
-
 end BTree
 
 #check BTree.to_list
 #check BTree.map
 
-/- Even better, values of type BTree can use the methods via the `.`. -/
+/- Values of type BTree can use the methods via the `.`. -/
 
 def T : BTree ℕ := BTree.leaf 0
 
@@ -316,7 +326,7 @@ end
 /-
 Expression Trees
 ===
-A common use case for mutual induction is to define terms and expressions.
+A common use case for mutual induction is to define terms and expressions in a Grammar.
 -/
 
 mutual
@@ -467,7 +477,7 @@ def chain : Node :=
   }
 
 /-
-Note that not using `Option` type checks, but without additional assumptions
+Note: A version that does not use `Option` type checks, but without additional assumptions,
 has no inhabitants.
 -/
 
@@ -528,7 +538,7 @@ def p : MyProd Rat String := ⟨ 0, "zero" ⟩
 #eval p.fst
 #eval p.snd
 
-/- Lean's Prod uses `×`: -/
+/- Lean's Prod uses `×` as syntactic sugar: -/
 
 def q : Rat × String := ⟨ 1, "one" ⟩
 
@@ -596,13 +606,16 @@ def DPT := Π n : ℕ, Fin (n+1)
 def DPT' := (n : ℕ) → Fin (n+1)
 
 /-
-which is the set of sequences `σ` of natural numbers where `σ(n) < n`. For example,
+which is the set of sequences `σ` of natural numbers where `σ(n) < n + 1`. For example,
 -/
 
 def σ1 : DPT := fun n => ⟨ n, by lia ⟩
 def σ2 : DPT' := fun n => ⟨ n/2, by lia ⟩
 
-/- Since we haven't covered proofs yet, we'll dig in to these ideas later. -/
+/-
+In σ₁, `by lia` is a proof that `n ≤ n + 1`. And in σ₂ it is
+a proof that `n/s ≤ n+1`.
+Since we haven't covered proofs yet, we'll dig in to these ideas later. -/
 
 /-
 Sums
@@ -625,7 +638,7 @@ def swap (s : MySum Rat String) : MySum String Rat :=
   | .inl x => .inr x
   | .inr x => .inl x
 
-/- Lean's Sum uses `⊕`: -/
+/- Lean's Sum uses `⊕` as syntactic sugar: -/
 
 def s : Rat ⊕ String := .inl 1
 
@@ -657,24 +670,35 @@ Suppose we have two disjoint copies of a space `X`. Then `X ⊕ X` <br>
 is the type of points in that space. They are either a point <br>
 from the "left" side or a point in the "right" side.
 
-For example, to start building an identification topology we might:
+For example, to start building a the Wedge identification topology we might do:
 -/
 
 def TwoR := ℝ ⊕ ℝ
+def TwoR.glue (x y : TwoR) : Prop :=  x = .inl 0 ∧ y = .inr 0
 
-def equiv (x y : TwoR) : Prop := match x,y with
-  | .inl a, .inl b => a = b
-  | .inr a, .inr b => a = b
-  | .inl a, .inr b => a = 0 ∧ b = 0
-  | .inr a, .inl b => a = 0 ∧ b = 0
+/- Then show `equiv` is an equivalence relation and take the quotient. -/
 
-/- Then show `equiv` is an equivalence relation and take the quotient
+/-
+Exercises (Optional)
+===
 
-```lean
-TwoR / equiv
-```
-We'll get to what this means and how to do it later. -/
+<ex /> Define `TwoR'` the _line with two origins_, with two copies of ℝ in
+which all _but_ the zeros are identified with their corresponding elements.
 
+<ex /> You can _infer_ the Wedge topology from two copies of ℝ with:
+-/
+
+abbrev TwoOrigins := Quot (fun x y : ℝ ⊕ ℝ => x = y ∧ x ≠ .inl 0)
+
+abbrev Wedge := Quot TwoR.glue
+
+instance : TopologicalSpace TwoR :=
+  inferInstanceAs (TopologicalSpace (ℝ ⊕ ℝ))
+
+instance : TopologicalSpace Wedge :=
+  inferInstanceAs (TopologicalSpace (Quot _))
+
+/- Do the same for the line with two origins. -/
 
 
 /-
@@ -689,7 +713,7 @@ structure Sigma {α : Type} (β : α → Type) where
   snd : α → β fst
 ```
 
-Lean provides several equivalent notations:
+Lean provides several equivalent notations (illustrated with Fin n).
 -/
 
 def SigT   := Sigma (fun n : ℕ => Fin n)
@@ -721,9 +745,8 @@ Approximate π with `22/7` (or whatever your favorite approximate is).-/
 Notation
 ===
 
-Lean uses user-defined syntax extensively to make code look more like math.
-
-This can make it challenging to figure out what an expression means.
+Lean uses user-defined syntax extensively to make code look more like math,
+altough this can make it challenging to figure out what an expression means.
 
 For example, suppose we defined addition as
 -/

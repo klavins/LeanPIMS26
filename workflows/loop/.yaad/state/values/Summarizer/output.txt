@@ -1,0 +1,88 @@
+Using only raw Lean 4, with the initial keyword prelude at the beginning of your code, define the natural numbers, addition on the natural numbers, and prove that addition is commutative. 
+
+Output only LEAN4 code. No comments. No thought processes. No backtics and fences. 
+prelude
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+inductive Eq {α : Type} (a : α) : α → Type where
+  | refl : Eq a a
+
+infix:50 " = " => Eq
+
+def add : Nat → Nat → Nat
+  | n, Nat.zero => n
+  | n, Nat.succ m => Nat.succ (add n m)
+
+theorem congrArg {α β : Type} (f : α → β) {a b : α} (h : a = b) : f a = f b :=
+  match h with
+  | Eq.refl => Eq.refl
+
+theorem zero_add (n : Nat) : add Nat.zero n = n :=
+  match n with
+  | Nat.zero => Eq.refl
+  | Nat.succ n' => congrArg Nat.succ (zero_add n')
+
+theorem succ_add (n m : Nat) : add (Nat.succ n) m = Nat.succ (add n m) :=
+  match m with
+  | Nat.zero => Eq.refl
+  | Nat.succ m' => congrArg Nat.succ (succ_add n m')
+
+theorem add_comm (n m : Nat) : add n m = add m n :=
+  match m with
+  | Nat.zero =>
+    match zero_add n with
+    | Eq.refl => Eq.refl
+  | Nat.succ m' =>
+    match add_comm n m' with
+    | Eq.refl =>
+      match succ_add m' n with
+      | Eq.refl => Eq.refl
+[0]
+line 3, column 0: failed to construct `T.ctorIdx` for `Nat`:
+  Unknown constant `Nat.casesOn`
+
+[1]
+line 7, column 0: failed to construct `T.ctorIdx` for `Eq`:
+  Unknown constant `Eq.casesOn`
+
+[2]
+line 10, column 0: Unknown constant `Lean.TrailingParserDescr`
+
+[3]
+line 10, column 0: invalid syntax node kind `«term_=_»`
+
+[4]
+line 10, column 0: Unknown constant `Lean.PrettyPrinter.Unexpander`
+
+[5]
+line 13, column 2: Unknown constant `PProd.mk`
+
+[6]
+line 16, column 59: expected token
+
+[7]
+line 20, column 44: expected token
+
+[8]
+line 20, column 29: Unknown identifier `add`
+
+Note: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`.
+
+[9]
+line 25, column 50: expected token
+
+[10]
+line 25, column 31: Unknown identifier `add`
+
+Note: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`.
+
+[11]
+line 30, column 39: expected token
+
+[12]
+line 30, column 31: Unknown identifier `add`
+
+Note: It is not possible to treat `add` as an implicitly bound variable here because the `autoImplicit` option is set to `Bool.false`.
