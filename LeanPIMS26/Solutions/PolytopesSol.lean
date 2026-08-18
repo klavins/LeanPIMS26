@@ -254,8 +254,8 @@ Remember that each one now needs a finiteness proof as well. The theorem `Set.to
 -- (0,0), (0,1), (1,0)
 def P : VPolytope (ℝn 2) :=
   VPolytope.mk
-    { !₂[0, 0],
-      !₂[1, 0],
+    { !₂[0, 0], -- ! is used in vector-like notations to differentiate from lists.
+      !₂[1, 0], -- the ₂ is used to indicate that it carries an L² norm.
       !₂[0, 1] }
     (Set.toFinite _) -- Or Set.toFinite ({!₂[0, 0],!₂[1, 0],!₂[0, 1]} : Set (ℝn 2))
 
