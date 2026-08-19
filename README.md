@@ -16,5 +16,5 @@ ws
 
 and then navigate to the URL that `ws` reports. 
 
-Note that `ws` is a local web server: https://github.com/lwsjs/local-web-server. 
+Note that `ws` is a local web server: https://github.com/lwsjs/local-web-server. You can also use `npx local-web-server` on the last line instead of `ws`.
 
