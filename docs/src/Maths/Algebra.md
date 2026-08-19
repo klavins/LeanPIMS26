@@ -50,10 +50,10 @@ Groups
 
 A **Group** is a set `G` along with a binary operation `∘` having the following properties:
 - Associativity : `(a ∘ b) ∘ c = a ∘ (b ∘ c)` for all `a`, `b`, and `c`
-- Identity Element: There is an element `e` such that `a ∘ e = a` for all `a`
-- Inverses: Every element `a` has an inverse `a⁻¹` such that `a ∘ a⁻¹ = e`
+- Identity Element: There is an element `e` such that `e ∘ a  = a` for all `a`
+- Inverses: Every element `a` has an inverse `a⁻¹` such that `a⁻¹ ∘ a = e`
 
-A **Monoid** is a group without inverses.
+A **Monoid** is a set with an associative operation and an identity.
 
 A **Commutative Group** is a group where `a ∘ b = b ∘ a` for all `a` and `b`.
 
@@ -143,7 +143,7 @@ Group Notation
 
 The group operation can either be like addition or like multiplication,
 depending on the application. We'll assume our operation is
-like `+`.
+like `+` (even though we haven't said this is an Abelian group).
 
 
 ```lean
@@ -851,10 +851,13 @@ end LeanW26
 License
 ===
 
-Copyright (C) 2025  Eric Klavins
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.   
+(at your option) any later version.  
+
+Please see the full license at
+<a href="https://github.com/klavins/LeanPIMS26">
+https://github.com/klavins/LeanPIMS26
+</a>
 

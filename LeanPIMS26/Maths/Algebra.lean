@@ -68,10 +68,10 @@ Groups
 
 A **Group** is a set `G` along with a binary operation `∘` having the following properties:
 - Associativity : `(a ∘ b) ∘ c = a ∘ (b ∘ c)` for all `a`, `b`, and `c`
-- Identity Element: There is an element `e` such that `a ∘ e = a` for all `a`
-- Inverses: Every element `a` has an inverse `a⁻¹` such that `a ∘ a⁻¹ = e`
+- Identity Element: There is an element `e` such that `e ∘ a  = a` for all `a`
+- Inverses: Every element `a` has an inverse `a⁻¹` such that `a⁻¹ ∘ a = e`
 
-A **Monoid** is a group without inverses.
+A **Monoid** is a set with an associative operation and an identity.
 
 A **Commutative Group** is a group where `a ∘ b = b ∘ a` for all `a` and `b`.
 
@@ -166,7 +166,7 @@ Group Notation
 
 The group operation can either be like addition or like multiplication,
 depending on the application. We'll assume our operation is
-like `+`.
+like `+` (even though we haven't said this is an Abelian group).
 
 -/
 
