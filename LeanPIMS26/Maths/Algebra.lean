@@ -1,4 +1,4 @@
-import mathlib.tactic
+import Mathlib.Tactic
 
 namespace LeanW26
 
@@ -48,9 +48,9 @@ theorem my_theorem {α : Type u} [MyClass α] {x y z : α} : P x y z := ...
 Example Typeclass Hierarchies
 ===
 
-- A `Field` is built from a `Ring`, which is built from a `Monoid` and a `Group` (today)
+- A `Field` is built from a `Ring`, which is built from a `Monoid` and a `CommutativeGroup` (today)
 - An `Automaton` is built from `Graph` and an `IO` relation
-- A `MetricSpace` is built from a `PsuedometricSpace` and a `DistanceFunction`
+- A `MetricSpace` is built from a `PseudometricSpace` and a separation axiom.
 - A `CartesianClosedCategory` is built from a `Category` with `HasProducts` and `HasExponentials`.
 
 It is 100% worth rebuilding these edifices from scratch, even though they are
@@ -58,7 +58,7 @@ defined in Mathlib (and in other proof assistants like Agda, Rocq, Isabelle, etc
 
 So, with the aim of learning *how* to formalize, we rebuild some of the very basic
 foundations of modern algebra. Hopefully this will help you use Mathlib, which is
-built using similar principle.
+built using similar principles.
 
 -/
 
@@ -68,10 +68,10 @@ Groups
 
 A **Group** is a set `G` along with a binary operation `∘` having the following properties:
 - Associativity : `(a ∘ b) ∘ c = a ∘ (b ∘ c)` for all `a`, `b`, and `c`
-- Identity Element: There is an element `e` such that `a ∘ e = a` for all `a`
-- Inverses: Every element `a` has an inverse `a⁻¹` such that `a ∘ a⁻¹ = e`
+- Identity Element: There is an element `e` such that `e ∘ a  = a` for all `a`
+- Inverses: Every element `a` has an inverse `a⁻¹` such that `a⁻¹ ∘ a = e`
 
-A **Monoid** is a group without inverses.
+A **Monoid** is a set with an associative operation and an identity.
 
 A **Commutative Group** is a group where `a ∘ b = b ∘ a` for all `a` and `b`.
 
@@ -91,7 +91,7 @@ Building the Theory
 ===
 
 Group theory is a huge topic, well beyond the scope of this course and
-advanced results require more infrastrcture than presented here, but much of
+advanced results require more infrastructure than presented here, but much of
 it is available in Mathlib.
 
 Historically, the application of proof assistants to Group Theory were
@@ -99,9 +99,9 @@ some of the early successes of the technology.
 
 For example:
 
-- Rideu and Théry, "Formalising Sylow’s theorems in Coq", 2006. [(link)](https://arxiv.org/pdf/cs/0611057). Also appears in Mathlib [(link)](https://leanprover-community.github.io/mathlib4_docs/Mathlib/GroupTheory/Sylow.html).
+- Rideau and Théry, "Formalising Sylow’s theorems in Coq", 2006. [(link)](https://arxiv.org/pdf/cs/0611057). Also appears in Mathlib [(link)](https://leanprover-community.github.io/mathlib4_docs/Mathlib/GroupTheory/Sylow.html).
 
-- Gontheir et al, "A Machine-Checked Proof of the Odd Order Theorem", ITP 2013.
+- Gonthier et al, "A Machine-Checked Proof of the Odd Order Theorem", ITP 2013.
 [(link)](https://www.cs.unibo.it/~asperti/PAPERS/odd_order.pdf). Original proof is 255 pages long.
 
 - ...
@@ -129,7 +129,7 @@ universe u
 /-
 Mathlib defines Groups and other algebraic structures in a considerably more
 sophisticated way than we do here, although it uses similar typeclasses. The goal with
-Mathlib is to build a general proof-checking environment, not to teach formaliziation.
+Mathlib is to build a general proof-checking environment, not to teach formalization.
 
 Actual abstract algebra projects should use Mathlib's typeclasses.
 
@@ -166,7 +166,7 @@ Group Notation
 
 The group operation can either be like addition or like multiplication,
 depending on the application. We'll assume our operation is
-like `+`.
+like `+` (even though we haven't said this is an Abelian group).
 
 -/
 
@@ -203,8 +203,8 @@ theorem Group.id_inv_left {G : Type u} [Group G] {a : G}
 
 /-
 The variable declarations become
-extremely repetetive and clutter the code, making it harder to read. Therefore,
-we delare variables for all of our subsequent `Group` theorems ahead of time with
+extremely repetitive and clutter the code, making it harder to read. Therefore,
+we declare variables for all of our subsequent `Group` theorems ahead of time with
 -/
 
 variable {G : Type u} [Group G] {a b c : G}
@@ -311,7 +311,7 @@ A `calc` proof goes like this:
 b = b + e = b + (a + c) = (b + a) + c = e + c = c
 ```
 Note that the substitution `e = a+c` is not automatic, since the
-hypothesis is `e = c+a`. You might need an auxilliary lemma.
+hypothesis is `e = c+a`. You might need an auxiliary lemma.
 -/
 
 /-
@@ -494,7 +494,7 @@ end section
 Operating on Equations
 ===
 
-When proving `Ring` identites, it is useful to operate on both sides
+When proving `Ring` identities, it is useful to operate on both sides
 of an equation. That is, we may want to change the proof from
 
 ```lean
@@ -540,7 +540,7 @@ theorem mul_zero : x * e = e := by
 /- The `rw` part can be replaced with `simp only [id_left,inv_left,←assoc] at h`-/
 
 /-
-Others Examples
+Other Examples
 ===
 -/
 
@@ -575,7 +575,7 @@ theorem factor_mul_inv_right : x*(-y) = -(x*y) := sorry
 One way to prove this identity is as follows:
 
 - Establish `y + -y = e`
-- Establish `x * (y + -y) = x * e` by multipliying both sides by `x`
+- Establish `x * (y + -y) = x * e` by multiplying both sides by `x`
 - Simplify to `x * y + x * -y = e`
 - Add `-(x*y)` to both sides and simplify
 
@@ -585,7 +585,7 @@ One way to prove this identity is as follows:
 Spin is a Monoid
 ===
 
-First we definition multiplication for `Spin`.
+First we define multiplication for `Spin`.
 -/
 
 def Spin.mul (a b : Spin) : Spin :=
@@ -811,7 +811,7 @@ theorem one_ne_e : (one:F) ≠ e := by
   exact hxy (hx.trans hy.symm)
 
 /-
-Spin is a a Nonempty Commutative Ring
+Spin is a a Nontrivial Commutative Ring
 ===
 -/
 
@@ -882,7 +882,7 @@ not Mathlib's). For the properties, find them [here](https://leanprover-communit
 or by just checking `by apply?`.
 
 You can do this all at once with `instance : Ring ℤ` or by building up
-`Group`, `Monoind`, `Ring`, and `CommRing` sequentially.
+`Group`, `Monoid`, `Ring`, and `CommRing` sequentially.
 
 <ex /> (Optional) Show that in a `Field`, `(a*b)⁻¹ = (a⁻¹)*(b⁻¹)`.
 You should build up several simpler identities about `Ring` before tackling this one.
