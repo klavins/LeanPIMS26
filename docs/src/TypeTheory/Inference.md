@@ -210,15 +210,18 @@ We have already encounterd the elimination rule, which is  `.rec` For example, w
 `Nat` we can write `.rec` inference rule style as something like.
 
 ```none
-            Γ ⊢ m : Nat → Sort u   Γ ⊢ m 0    Γ, Π n:Nat, Π m n, m n.succ
+              Γ ⊢ f : Nat → Sort u    Γ ⊢ f 0     Γ ⊢ ∀ k, f k → f (k+1)
  Nat-Elim   ———————————————————————————————————————————————————————————————
-                            Γ, t:Nat ⊢ motive t
+                               Γ, n:Nat ⊢ f n
 ```
 
 What's cool is that you can basically program Lean's type inference engine
 (the kernel) with new inference rules by defining inductive types.
 
 
+```lean
+#check Nat.rec
+```
 
 Lean's Kernel
 ===
