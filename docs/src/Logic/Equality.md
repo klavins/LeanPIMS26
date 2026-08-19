@@ -42,7 +42,7 @@ Refl is Powerful
 ===
 
 Terms that are beta-reducible to each other are considered definitionally equal.
-You can show many of equalities automatically 
+You can show many equalities automatically 
 ```lean
 example : 1 ~ 1 :=
   MyEq.refl 1

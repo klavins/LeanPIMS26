@@ -194,7 +194,7 @@ The slides are on the web at:
 The source code to the slides are at:
 - [https://github.com/klavins/LeanPIMS26](https://github.com/klavins/LeanPIMS26)
 - Clone this repo and following along in class
-- Do `git update` *before* each class meeting
+- Do `git pull` *before* each class meeting
 
 Resources
 ===
