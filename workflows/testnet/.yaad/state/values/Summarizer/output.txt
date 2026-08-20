@@ -1,0 +1,77 @@
+prelude
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+inductive Eq {α : Type} (a : α) : α → Type where
+  | refl : Eq a a
+
+def add : Nat → Nat → Nat
+  | n, Nat.zero => n
+  | n, Nat.succ m => Nat.succ (add n m)
+
+notation:65 a " + " b => add a b
+notation:50 a " = " b => Eq a b
+
+def one : Nat := Nat.succ Nat.zero
+def two : Nat := Nat.succ one
+
+notation "1" => one
+notation "2" => two
+
+theorem one_plus_one_equals_two : 1 + 1 = 2 := Eq.refl
+
+=======================
+
+A student wrote the above code. They are trying to formalize this problem in Lean4. THEY ARE NOT ALLOWED TO USE ANY IMPORTS!
+
+Show that 1+1=2 in lea4 without using any imports. In fact, put prelude at the top of the file. Output only Lean4 code. No thinking process. No comments. No backticks. No codes fences. The output will be evaluated using Lean 4.
+
+In their last attempt, the got the following errors:
+
+[0]
+line 3, column 0: failed to construct `T.ctorIdx` for `Nat`:
+  Unknown constant `Nat.casesOn`
+
+[1]
+line 7, column 0: failed to construct `T.ctorIdx` for `Eq`:
+  Unknown constant `Eq.casesOn`
+
+[2]
+line 11, column 2: Unknown constant `PProd.mk`
+
+[3]
+line 14, column 0: Unknown constant `Lean.TrailingParserDescr`
+
+[4]
+line 14, column 0: invalid syntax node kind `«term_+_»`
+
+[5]
+line 15, column 0: Unknown constant `Lean.TrailingParserDescr`
+
+[6]
+line 15, column 0: invalid syntax node kind `«term_=_»`
+
+[7]
+line 15, column 0: Unknown constant `Lean.PrettyPrinter.Unexpander`
+
+[8]
+line 20, column 9: invalid atom
+
+[9]
+line 21, column 9: invalid atom
+
+[10]
+line 23, column 35: unexpected token '+'; expected ':=', 'where' or '|'
+
+[11]
+line 23, column 34: Unknown constant `OfNat`
+
+[12]
+line 17, column 4: Unknown constant `Nat.add`
+
+[13]
+line 18, column 4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'one', which is 'noncomputable'
+
+Summarize the errors and explain to the student what they did wrong and give them the advice they need to fix them and produce clean code. 

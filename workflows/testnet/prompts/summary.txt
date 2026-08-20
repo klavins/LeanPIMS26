@@ -1,0 +1,13 @@
+{code}
+
+=======================
+
+A student wrote the above code. They are trying to formalize this problem in Lean4. THEY ARE NOT ALLOWED TO USE ANY IMPORTS!
+
+{problem}
+
+In their last attempt, the got the following errors:
+
+{errors}
+
+Summarize the errors and explain to the student what they did wrong and give them the advice they need to fix them and produce clean code. 

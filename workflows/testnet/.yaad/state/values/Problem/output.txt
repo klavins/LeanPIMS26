@@ -1,0 +1,1 @@
+Show that 1+1=2 in lea4 without using any imports. In fact, put prelude at the top of the file. Output only Lean4 code. No thinking process. No comments. No backticks. No codes fences. The output will be evaluated using Lean 4.

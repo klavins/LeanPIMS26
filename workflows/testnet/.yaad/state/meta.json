@@ -2,7 +2,7 @@
   "version": 1,
   "blocks": {
     "Problem": {
-      "steps": 2,
+      "steps": 1,
       "published": true,
       "ports": {
         "output": "values/Problem/output.txt"
@@ -13,7 +13,7 @@
       "steps": 1,
       "published": true,
       "ports": {
-        "response": "values/Student/response.txt"
+        "response": "values/Student/response.lean"
       },
       "state": {
         "calls": 1,

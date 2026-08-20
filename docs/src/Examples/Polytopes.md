@@ -108,6 +108,12 @@ theorem isCompact (P : VPolytope E) : IsCompact P.carrier :=
 
 theorem isConvex (P : VPolytope E) : Convex ℝ P.carrier :=
   convex_convexHull ℝ _
+
+theorem isBounded (P : VPolytope E) : Bornology.IsBounded P.carrier := by
+  exact IsCompact.isBounded (isCompact P)
+
+theorem isClosed (P : VPolytope E) : IsClosed P.carrier := by
+  exact IsCompact.isClosed (isCompact P)
 ```
 
 An underscore is simply an argument that Lean can recover from the surrounding types. The `_` in the proof of `isConvex` is referring to `P.points`. However, Lean is able to infer the argument!

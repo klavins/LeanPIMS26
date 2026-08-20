@@ -56,11 +56,11 @@ A Definition in Lean
 ===
 
 The type of objects is a *parameter*. The arrows are a field, indexed by pairs of
-objects. Objects and arrows each are allowed to live in their own universes.
+objects.
 
 ```lean
-structure Category.{v, u} (Obj : Type u) where
-  Hom  : Obj → Obj → Type v
+structure NaiveCategory (Obj : Type) where
+  Hom  : Obj → Obj → Type
   id   : (A : Obj) → Hom A A
   comp {A B C : Obj} : Hom A B → Hom B C → Hom A C
   id_comp : ∀ {A B} (f : Hom A B), comp (id A) f = f
@@ -69,13 +69,9 @@ structure Category.{v, u} (Obj : Type u) where
               comp (comp f g) h = comp f (comp g h)
 ```
 
-`Hom` is a *function*: given two objects, it returns a type. So `Hom A B` is just some type, in the universe `v`.
+`Hom` is a *function*: given two objects, it returns a type. So `Hom A B` is
+just some type, chosen by the function `Hom`.
 
-```lean
---hide
-universe u v
---unhide
-```
 
 Convention: Composition Order
 ===
@@ -85,7 +81,7 @@ following the arrows. Others write `g ∘ f` instead; "`g` after `f`".
 
 
 ```lean
-#check Category.comp -- self.Hom A B → self.Hom B C → self.Hom A C
+#check NaiveCategory.comp -- self.Hom A B → self.Hom B C → self.Hom A C
 ```
 
 The Category of Types
@@ -97,6 +93,66 @@ Lean itself forms a category!
 - Identity and composition are identity and composition
 
 ```lean
+def Types : NaiveCategory Type where
+  Hom A B := A → B -- the type of functions from `A` to `B`
+  id _A := fun a => a -- aka `id`, the identity function on `_A`
+  comp f g := fun a => g (f a) -- could have been written g ∘ f
+  id_comp _A := rfl
+  comp_id _A := rfl
+  assoc _f _g _h := rfl
+```
+
+
+And we've already hit a brick wall
+===
+
+```lean
+structure NaiveCategory (Obj : Type) where
+  Hom  : Obj → Obj → Type
+  id   : (A : Obj) → Hom A A
+  comp {A B C : Obj} : Hom A B → Hom B C → Hom A C
+  id_comp : ∀ {A B} (f : Hom A B), comp (id A) f = f
+  comp_id : ∀ {A B} (f : Hom A B), comp f (id B) = f
+  assoc   : ∀ {A B C D} (f : Hom A B) (g : Hom B C) (h : Hom C D),
+              comp (comp f g) h = comp f (comp g h)
+
+def Types : NaiveCategory Type where
+  Hom A B := A → B -- the type of functions from `A` to `B`
+  id _A := fun a => a -- aka `id`, the identity function on `_A`
+  comp f g := fun a => g (f a) -- could have been written g ∘ f
+  id_comp _A := rfl
+  comp_id _A := rfl
+  assoc _f _g _h := rfl
+```
+
+Application type mismatch: The argument
+     `Type`
+   has type
+     `Type 1`
+   of sort `Type 2` but is expected to have type
+     `Type`
+   of sort `Type 1` in the application
+     `NaiveCategory Type`.
+
+
+
+The fix: Universes!
+===
+
+
+```lean
+structure Category.{v, u} (Obj : Type u) where
+  Hom  : Obj → Obj → Type v
+  id   : (A : Obj) → Hom A A
+  comp {A B C : Obj} : Hom A B → Hom B C → Hom A C
+  id_comp : ∀ {A B} (f : Hom A B), comp (id A) f = f
+  comp_id : ∀ {A B} (f : Hom A B), comp f (id B) = f
+  assoc   : ∀ {A B C D} (f : Hom A B) (g : Hom B C) (h : Hom C D),
+              comp (comp f g) h = comp f (comp g h)
+
+-- Declare these universes for later use:
+universe u v
+
 def Types : Category (Type u) where
   Hom A B := A → B -- the type of functions from `A` to `B`
   id _A := fun a => a -- aka `id`, the identity function on `_A`
@@ -536,7 +592,7 @@ categorical laws, like `eqToHom`.
 Why a `class` and Not a `structure`?
 ===
 
-Ours takes the category as an argument, so we have to name it and pass it around:
+Structures need to have names `C` and must be passed around explicitly:
 
 
 ```lean
@@ -556,6 +612,9 @@ example {C : Type u} [Category.{v} C] (A B E : C)
 If `C` is a specific type with an existing `Category` instance, then the
 `[Category C]` can be omitted entirely!
 
+The clear advantage of Mathlib is ergonomics. Classes don't let you express
+*more* than structures, but they let you express many things easier.
+
 
 
 The Cost: One Category Per Type
@@ -573,7 +632,6 @@ local instance dvdCat : Category ℕ where
   Hom a b := ULift (PLift (a ∣ b))
   id a := ⟨⟨dvd_refl a⟩⟩
   comp f g := ⟨⟨dvd_trans f.down.down g.down.down⟩⟩
-
 --hide
 ```
 - error: Type mismatch
@@ -656,8 +714,6 @@ but also not `Dvd`, `Monoid`, or `DecidableEq`. You have to wire those up
 yourself if you want them.
 
 Mathlib uses type synonyms and one-field structures frequently for this reason!
-Another fix is defining instances locally to a definition, but that gets old
-fast.
 
 
 Why `:= by cat_disch`?
@@ -689,6 +745,9 @@ exactly the equivalences of machine knitted objects, so I use them to provide
 formal semantics for machine knitting code! I'm currently working on an
 optimizing compiler that makes fancy sweaters real fast using category theory.
 
+<img src="https://nathurtig.com/figs/knit.png" style="display: block; margin: 0 auto; width: 70%;">
+
+
 
 Key Takeaways
 ===
@@ -707,7 +766,7 @@ type synonym or one-field definition, and it costs you every other instance on
 that type. That is what `Paths`, dual categories, and many others are.
 
 **Read Mathlib code, even if you don't use it.** The maintainers have made
-mistakes, fought battles, and documented their journeys. Take the free
+mistakes, fought battles, and documented their journeys. Take their free
 guidance!
 
 

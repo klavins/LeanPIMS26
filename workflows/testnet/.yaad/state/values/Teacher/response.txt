@@ -1,0 +1,17 @@
+prelude
+
+inductive Nat : Type where
+  | zero : Nat
+  | succ : Nat → Nat
+
+inductive Eq {α : Type} (a : α) : α → Type where
+  | refl : Eq a a
+
+def add (n m : Nat) : Nat :=
+  Nat.rec n (fun _ rec => Nat.succ rec) m
+
+def one : Nat := Nat.succ Nat.zero
+def two : Nat := Nat.succ one
+
+theorem one_plus_one_equals_two : Eq (add one one) two :=
+  Eq.refl
